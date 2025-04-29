@@ -6,8 +6,8 @@
 
 # 👨‍💻 Autores 
 
-* 👤  - [FRANCISCO LEONEL GALLARDO] (https://github.com/Naranja-sys)
-* 👤 -  [ALEX CHOCALA] (https://github.com/AlexChocala/)
+* 👤  - [FRANCISCO LEONEL GALLARDO](https://github.com/Naranja-sys)
+* 👤 -  [ALEX CHOCALA](https://github.com/AlexChocala/)
 * 🧡 Agradecido con el de arriba
 
 ## 📝 Características del proyecto POMELO
