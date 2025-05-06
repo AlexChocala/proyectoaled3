@@ -28,7 +28,7 @@
 ## ✨ **Introducción**
 
 💡 _Explicación sobre el propósito del proyecto, el contexto y el problema que soluciona._  
-**Ejemplo**: Este proyecto busca simplificar procesos complejos, haciéndolos accesibles para todos.
+**Ejemplo**: Objetivo de mejora y blah
 
 ---
 
