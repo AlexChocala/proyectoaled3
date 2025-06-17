@@ -1,0 +1,52 @@
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #222;
+  color: white;
+  padding: 15px 0;
+  text-align: center;
+
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  p {
+    font-size: 14px;
+  }
+
+  .social-links {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+
+    li {
+      display: inline-block;
+    }
+
+    a {
+      color: white;
+      font-size: 20px;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #007bff;
+        /* Cambio de color al pasar el mouse */
+      }
+    }
+  }
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
