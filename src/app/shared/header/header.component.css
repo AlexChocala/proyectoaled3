@@ -1,0 +1,115 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #213959;
+  color: white;
+  padding: 0.7rem 1.2rem;
+  font-family: 'Roboto', sans-serif;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.navbar-left .logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+.navbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1.2rem;
+}
+
+.navbar-center a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.navbar-center a:hover {
+  text-decoration: underline;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-icon {
+  font-size: 1.3rem;
+}
+
+.login-link {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.login-link:hover {
+  text-decoration: none;
+}
+
+.auth-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.logout-icon {
+  background: none;
+  color: white;
+  cursor: pointer;
+}
+
+.hamburger {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .user-email {
+    display: none;
+  }
+
+  .hamburger {
+    display: inline-block;
+  }
+
+  .navbar-center {
+    position: static;
+    transform: none;
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: center;
+  }
+}

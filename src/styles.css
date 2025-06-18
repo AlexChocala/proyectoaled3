@@ -1,4 +1,58 @@
-/* You can add global styles to this file, and also import other style files */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f5f6fa;
+  color: #2c2c2c; 
+}
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body, #root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Enlaces */
+a {
+  color: #2835ea; 
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #254aa5; 
+  text-decoration: underline;
+}
+
+/* Inputs y botones */
+input, button {
+  font-family: inherit;
+}
+
+input {
+  background-color: #ffffff;
+  color: #2c2c2c;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input::placeholder {
+  color: #888;
+}
+
+button {
+  background-color: #213959;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #254aa5;
+}

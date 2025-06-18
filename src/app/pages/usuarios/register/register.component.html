@@ -1,0 +1,64 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h2>Registro</h2>
+
+    <form [formGroup]="formularioUsuario" (ngSubmit)="registrar()">
+      <div class="mb-3">
+        <label for="nombre">Nombre:</label>
+        <input id="nombre" type="text" formControlName="nombre" class="form-control" />
+        <div *ngIf="formularioUsuario.get('nombre')?.touched && formularioUsuario.get('nombre')?.invalid"
+          class="text-danger">
+          <small>El nombre es obligatorio.</small>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="apellido">Apellido:</label>
+        <input id="apellido" type="text" formControlName="apellido" class="form-control" />
+        <div *ngIf="formularioUsuario.get('apellido')?.touched && formularioUsuario.get('apellido')?.invalid"
+          class="text-danger">
+          <small>El apellido es obligatorio.</small>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="email">Email:</label>
+        <input id="email" type="email" formControlName="email" class="form-control" />
+        <div *ngIf="formularioUsuario.get('email')?.touched && formularioUsuario.get('email')?.invalid"
+          class="text-danger">
+          <small *ngIf="formularioUsuario.get('email')?.errors?.['required']">El email es obligatorio.</small>
+          <small *ngIf="formularioUsuario.get('email')?.errors?.['email']">El email no es válido.</small>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="contraseña">Contraseña:</label>
+        <input id="contraseña" type="password" formControlName="contraseña" class="form-control" />
+        <div *ngIf="formularioUsuario.get('contraseña')?.touched && formularioUsuario.get('contraseña')?.invalid"
+          class="text-danger">
+          <small *ngIf="formularioUsuario.get('contraseña')?.errors?.['required']">La contraseña es obligatoria.</small>
+          <small *ngIf="formularioUsuario.get('contraseña')?.errors?.['minlength']">Debe tener al menos 6
+            caracteres.</small>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <button type="submit" [disabled]="formularioUsuario.invalid" class="btn btn-success">Registrar</button>
+      </div>
+    </form>
+
+    <div *ngIf="mensajeExito" class="message-success">
+      {{ mensajeExito }}
+      <a routerLink="/login">Inicia sesión</a>
+    </div>
+
+    <div *ngIf="mensajeError" class="message-error">
+      {{ mensajeError }}
+    </div>
+
+    <p class="bottom-text">
+      ¿Ya tienes una cuenta?
+      <a routerLink="/login">Iniciar sesión</a>
+    </p>
+  </div>
+</div>
