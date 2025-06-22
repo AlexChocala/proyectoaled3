@@ -1,58 +1,6 @@
 <nav class="navbar">
-  <!-- Izquierda: Logo o texto -->
-  <div class="navbar-left">
-    <!-- Cambiar span por a con routerLink para que sea clickeable -->
-    <a routerLink="/home" class="logo" style="cursor: pointer;">Pomelo</a>
-  </div>
-
-  <!-- Centro: Links de navegación solo en desktop -->
-  <div class="navbar-center desktop-only">
-    <a routerLink="/productos">Productos</a>
-    <a *ngIf="isLoggedIn" routerLink="/facturacion">Facturación</a>
-  </div>
-
-  <!-- Derecha: Estado de sesión -->
-  <div class="navbar-right">
-    <!-- No logueado -->
-    <ng-container *ngIf="!isLoggedIn; else loggedInBlock">
-      <a class="login-link" routerLink="/login" aria-label="Iniciar sesión">
-        <mat-icon class="user-icon">person</mat-icon>
-        <span>Iniciar sesión</span>
-      </a>
-    </ng-container>
-
-    <!-- Logueado -->
-    <ng-template #loggedInBlock>
-      <mat-icon class="user-icon">person</mat-icon>
-      <span class="user-email">{{ email }}</span>
-      <button mat-icon-button (click)="logout()" class="logout-icon" aria-label="Cerrar sesión">
-        <mat-icon>logout</mat-icon>
-      </button>
-    </ng-template>
-
-    <!-- Ícono hamburguesa solo en móviles -->
-    <button mat-icon-button class="hamburger mobile-only" [matMenuTriggerFor]="menu" aria-label="Menú">
-      <mat-icon>menu</mat-icon>
-    </button>
-  </div>
-
-  <!-- Menú desplegable solo en móvil -->
-  <mat-menu #menu="matMenu">
-    <button mat-menu-item routerLink="/productos">
-      <mat-icon>inventory</mat-icon>
-      <span>Productos</span>
-    </button>
-    <button *ngIf="isLoggedIn" mat-menu-item routerLink="/facturacion">
-      <mat-icon>receipt</mat-icon>
-      <span>Facturación</span>
-    </button>
-    <button *ngIf="isLoggedIn" mat-menu-item (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Cerrar sesión</span>
-    </button>
-    <button *ngIf="!isLoggedIn" mat-menu-item routerLink="/login">
-      <mat-icon>login</mat-icon>
-      <span>Iniciar sesión</span>
-    </button>
-  </mat-menu>
+  <ul>
+    <li><a routerLink="/">INICIO</a></li>
+    <li><a routerLink="/login">R</a></li>
+  </ul>
 </nav>

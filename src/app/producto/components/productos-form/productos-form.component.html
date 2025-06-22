@@ -1,0 +1,67 @@
+<!-- ENCABEZADO FIJO -->
+<div class="dialog-encabezado">
+  <!-- <h2 mat-dialog-title>{{ esEdicion ? 'Modificar producto' : 'Alta de producto' }}</h2> -->
+  <h2 mat-dialog-title>FORMULARIO</h2>
+</div>
+<!-- CONTENIDO SCROLLABLE -->
+<div class="dialog-scrollable">
+  <form [formGroup]="formularioProducto" (ngSubmit)="registrar()" class="formulario-contenedor">
+    <!-- INPUT NOMBRE -->
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput type="text" formControlName="nombre" placeholder="zapatilla" required>
+      <!-- MI PLANTILLA -->
+      <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'nombre' }"></ng-container>
+    </mat-form-field>
+    <!-- INPUT DESCRIPCION //TODO Validacion-->
+    <mat-form-field appearance="outline">
+      <mat-label>Descripcion</mat-label>
+      <textarea matInput formControlName="descripcion" placeholder="hermosa zapa para el verano"></textarea>
+      <!-- MI PLANTILLA -->
+      <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'descripcion' }"></ng-container>
+    </mat-form-field>
+    <!-- INPUT PRECIO -->
+    <mat-form-field floatLabel="always" appearance="outline">
+      <mat-label>Precio</mat-label>
+      <input matInput inputmode="decimal" placeholder="99.99" formControlName="precio">
+      <span matTextPrefix>$&nbsp;</span>
+      <!-- MI PLANTILLA -->
+      <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'precio' }"></ng-container>
+    </mat-form-field>
+    <!-- INPUT CATEGORIA -->
+    <mat-form-field floatLabel="always" appearance="outline">
+      <mat-label>Categoria</mat-label>
+      <mat-select formControlName="categoria">
+        @for (cat of categoria; track cat) {
+        <mat-option [value]="cat">{{ cat }}</mat-option>
+        }
+      </mat-select>
+      <!-- MI PLANTILLA -->
+      <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'categoria' }"></ng-container>
+    </mat-form-field>
+    <!-- INPUT IMAGEN TODO AUN A CORREGIR-->
+    <!-- <mat-label>Imagen del producto</mat-label> -->
+    <!-- <input type="file" accept="image/*" formControlName="imagen"> -->
+    <!-- <mat-icon>upload</mat-icon> -->
+    <!-- MI PLANTILLA -->
+    <!-- <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'imagen' }"></ng-container> -->
+    <!-- BOTONES CONFIRMAR Y CANCELAR -->
+    <button mat-raised-button color="primary" type="submit" [disabled]="formularioProducto.invalid">
+      Confirmar
+    </button>
+    <button mat-button type="button" (click)="cancelar()">
+      Cancelar
+    </button>
+  </form>
+  <!-- PLANTILLA REUTILIZABLE -->
+  <ng-template #validaCampo let-campo="campo">
+    @if (getError(campo)) {
+    <mat-error>{{ getError(campo) }}</mat-error>
+    } @else if (formularioProducto.get(campo)?.valid) {
+    <mat-icon color="accent" class="icono-ok">check_circle</mat-icon>
+    }
+  </ng-template>
+</div>
+<!-- TEST1 FORM -->
+<!-- <pre>{{ formularioProducto.status }}</pre> -->
+<!-- <pre>{{ formularioProducto.value | json }}</pre> -->
