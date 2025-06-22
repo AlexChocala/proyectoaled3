@@ -10,22 +10,22 @@ const dbconfig = {
 
 let conexion;
 
-function conMysql(){
+function conMysql() {
   conexion = mysql.createConnection(dbconfig);
-  conexion.connect( (err)=> {
-    if(err){
+  conexion.connect((err) => {
+    if (err) {
       console.log(['db err'], err);
       setTimeout(conMysql(), 200);
-    }else {
+    } else {
       console.log('db conectado');
     }
-  } );
+  });
 
   conexion.on('error', err => {
-    console.log('[db err]',err);
-    if(err.code === 'PROTOCOL_CONNECTION_LOST' ){
+    console.log('[db err]', err);
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
       conMysql();
-    }else{
+    } else {
       throw err;
     }
   });
@@ -48,31 +48,53 @@ conMysql();
 * Trae todos los elementos de la base de datos de X tabla
 *
 */
-function todos(tabla){
-  return new Promise( (resolve,reject) => {
-    conexion.query(`SELECT * FROM ${tabla}`, (error,result) => {
+function todos(tabla) {
+  return new Promise((resolve, reject) => {
+    conexion.query(`SELECT * FROM ${tabla}`, (error, result) => {
       return error ? reject(error) : resolve(result);
     });
   });
 }
 
-function uno(tabla, id){
-    return new Promise( (resolve,reject) => {
-    conexion.query(`SELECT * FROM ${tabla} WHERE id=${id}`, (error,result) => {
+function uno(tabla, id) {
+  return new Promise((resolve, reject) => {
+    conexion.query(`SELECT * FROM ${tabla} WHERE id=${id}`, (error, result) => {
       return error ? reject(error) : resolve(result);
     });
   });
-
 }
 
-function agregar(tabla, data){}
+function agregar(tabla, data) {
+  return new Promise((resolve, reject) => {
+    conexion.query(`INSERT INTO ${tabla} SET ? ON DUPLICATE KEY UPDATE ?`, [data, data], (error, result) => {
+      return error ? reject(error) : resolve(result);
+    });
+  });
+}
 
-function eliminar(tabla,id){}
+
+function eliminar(tabla, data) {
+  return new Promise((resolve, reject) => {
+    conexion.query(`DELETE FROM ${tabla} WHERE id = ?`, data.id, (error, result) => {
+      return error ? reject(error) : resolve(result);
+    });
+  });
+}
 
 
-module.exports ={
+function query(tabla, consulta) {
+  return new Promise((resolve, reject) => {
+    conexion.query(`SELECT * FROM ${tabla} WHERE ?`, consulta, (error, result) => {
+      return error ? reject(error) : resolve(result[0]);
+    });
+  });
+}
+
+
+module.exports = {
   todos,
   uno,
   agregar,
-  eliminar
+  eliminar,
+  query
 }
