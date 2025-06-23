@@ -11,8 +11,8 @@ module.exports = function(dbInyectada) {
   }
 
 
-  async function login(nombre, contrasena) {
-    const data = await db.query(TABLA, { usuario: nombre });
+  async function login(email, contrasena) {
+    const data = await db.query(TABLA, { usuario: email });
     return bcrypt.compare(contrasena, data.contrasena)
       .then(resultado => {
         if (resultado === true) {

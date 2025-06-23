@@ -1,24 +1,25 @@
-import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
+import { CAMPOS, MAX_CONTRASENA, MAX_EMAIL, MAX_NOMBRE, MIN_CONTRASENA, MIN_EMAIL, MIN_NOMBRE, PATRON_CONTRASENA, PATRON_EMAIL, PATRON_NOMBRE } from '../field';
+import { AuthService } from '../../services/auth.service';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { AuthService } from '../../services/auth.service';
-import { CAMPOS, MAX_CONTRASENA, MAX_EMAIL, MIN_CONTRASENA, MIN_EMAIL, PATRON_CONTRASENA, PATRON_EMAIL } from '../field';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-registrar',
+  templateUrl: './registrar.component.html',
   imports: [MatIconModule, MatFormFieldModule, MatInputModule, CommonModule, FormsModule, ReactiveFormsModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './registrar.component.css'
 })
-export class LoginComponent {
+export class RegistrarComponent {
   formularioLogin: FormGroup;
   verContrasena = false;
 
   constructor(private authService: AuthService, private fb: FormBuilder) {
     this.formularioLogin = this.fb.group({
+      nombre: new FormControl('', [Validators.required, Validators.minLength(MIN_NOMBRE), Validators.maxLength(MAX_NOMBRE), Validators.pattern(PATRON_NOMBRE)]),
       email: new FormControl('', [Validators.required, Validators.minLength(MIN_EMAIL), Validators.maxLength(MAX_EMAIL), Validators.pattern(PATRON_EMAIL)]),
       contrasena: new FormControl('', [Validators.required, Validators.minLength(MIN_CONTRASENA), Validators.maxLength(MAX_CONTRASENA), Validators.pattern(PATRON_CONTRASENA)]),
     })
@@ -65,9 +66,5 @@ export class LoginComponent {
   ): (typeof CAMPOS)[number][T] | undefined {
     return CAMPOS.find(r => r.campo === campo)?.[propiedad];
   }
+
 }
-
-
-
-
-

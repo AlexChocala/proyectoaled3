@@ -1,0 +1,77 @@
+/* Fondo claro con degradado animado */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #f1f8ff, #fce4ec, #e8f5e9);
+  background-size: 300% 300%;
+  animation: fondoAnimado 20s ease infinite;
+}
+
+@keyframes fondoAnimado {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Encabezado */
+.dialog-encabezado {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+/* Contenedor principal */
+.dialog-scrollable {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* Formulario */
+.formulario-contenedor {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Inputs redondeados */
+mat-form-field {
+  border-radius: 12px;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  border-radius: 12px;
+}
+
+/* Estilo verde si es válido y enfocado */
+mat-form-field.ng-valid.ng-touched.mat-focused .mat-form-field-outline-thick {
+  border-color: #4caf50 !important;
+  box-shadow: 0 0 5px #66bb6a;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Botón deshabilitado */
+button[type="submit"]:disabled {
+  background-color: rgba(0, 0, 0, 0.12);
+  color: #999;
+  cursor: not-allowed;
+}

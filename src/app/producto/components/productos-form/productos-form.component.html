@@ -1,7 +1,10 @@
 <!-- ENCABEZADO FIJO -->
 <div class="dialog-encabezado">
   <!-- <h2 mat-dialog-title>{{ esEdicion ? 'Modificar producto' : 'Alta de producto' }}</h2> -->
-  <h2 mat-dialog-title>FORMULARIO</h2>
+  <!-- <h2 mat-dialog-title>FORMULARIO</h2> -->
+  <h2 mat-dialog-title [ngClass]="esEdicion ? 'titulo-modificar' : 'titulo-alta'">
+    {{ esEdicion ? 'MODIFICAR PRODUCTO' : 'ALTA PRODUCTO' }}
+  </h2>
 </div>
 <!-- CONTENIDO SCROLLABLE -->
 <div class="dialog-scrollable">
@@ -39,15 +42,18 @@
       <!-- MI PLANTILLA -->
       <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'categoria' }"></ng-container>
     </mat-form-field>
-    <!-- INPUT IMAGEN TODO AUN A CORREGIR-->
-    <!-- <mat-label>Imagen del producto</mat-label> -->
-    <!-- <input type="file" accept="image/*" formControlName="imagen"> -->
-    <!-- <mat-icon>upload</mat-icon> -->
-    <!-- MI PLANTILLA -->
-    <!-- <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'imagen' }"></ng-container> -->
+    <mat-form-field>
+      <!-- INPUT IMAGEN TODO AUN A CORREGIR-->
+      <mat-label>Imagen del producto</mat-label>
+      <!-- <input type="file" accept="image/*" formControlName="imagen" required> -->
+      <input matInput type="url" formControlName="imagen" placeholder="https://...">
+      <mat-icon>upload</mat-icon>
+      <!-- MI PLANTILLA -->
+      <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'imagen' }"></ng-container>
+    </mat-form-field>
     <!-- BOTONES CONFIRMAR Y CANCELAR -->
-    <button mat-raised-button color="primary" type="submit" [disabled]="formularioProducto.invalid">
-      Confirmar
+    <button mat-raised-button [ngClass]="esEdicion ? 'boton-modificar' : 'boton-alta'" color="primary" type="submit" [disabled]="formularioProducto.invalid">
+      {{ esEdicion ? 'MODIFICAR' : 'AGREGAR' }}
     </button>
     <button mat-button type="button" (click)="cancelar()">
       Cancelar
@@ -62,6 +68,3 @@
     }
   </ng-template>
 </div>
-<!-- TEST1 FORM -->
-<!-- <pre>{{ formularioProducto.status }}</pre> -->
-<!-- <pre>{{ formularioProducto.value | json }}</pre> -->

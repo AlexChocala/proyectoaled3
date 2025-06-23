@@ -1,10 +1,19 @@
+<div class="fondo-animado"></div>
 <!-- ENCABEZADO FIJO -->
 <div class="dialog-encabezado">
-  <h2 mat-dialog-title>LOGIN</h2>
+  <h2 mat-dialog-title>REGISTRO</h2>
 </div>
 <!-- CONTENIDO SCROLLABLE -->
 <div class="dialog-scrollable">
   <form [formGroup]="formularioLogin" (ngSubmit)="confirmar()" class="formulario-contenedor">
+    <!-- INPUT NOMBRE -->
+    <mat-form-field appearance="outline">
+      <mat-label>NOMBRE</mat-label>
+      <mat-icon matPrefix>user</mat-icon>
+      <input matInput type="text" formControlName="nombre" placeholder="ROBERTO" required>
+      <!-- MI PLANTILLA -->
+      <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'nombre' }"></ng-container>
+    </mat-form-field>
     <!-- INPUT EMAIL -->
     <mat-form-field appearance="outline">
       <mat-label>EMAIL</mat-label>

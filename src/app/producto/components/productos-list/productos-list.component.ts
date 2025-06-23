@@ -9,31 +9,33 @@ import { FormsModule } from '@angular/forms';
 import { ProductoFiltrarPipe } from '../../pipe/producto-filtrar.pipe';
 import { ProductosFormComponent } from '../productos-form/productos-form.component';
 import { Producto } from '../../model/producto';
-import { productos } from '../../model/fakeDatabase';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ProductoService } from '../../services/producto.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-productos-list',
-  imports: [ProductoFiltrarPipe, FormsModule, MatIconModule, MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule],
+  imports: [MatSnackBarModule, ProductoFiltrarPipe, FormsModule, MatIconModule, MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule],
   templateUrl: './productos-list.component.html',
   styleUrl: './productos-list.component.css'
 })
 export class ProductosListComponent {
   displayedColumns = ['imagen', 'nombre', 'descripcion', 'precio', 'categoria', 'accion'];
-  dataSource;
+  dataSource!: MatTableDataSource<Producto>;
   busqueda: string = '';
   productoParaEditar: Producto | null = null;
   esEdicion: boolean = false;
+  categoriasDisponibles!: String[];
 
-  constructor(private productoService: ProductoService, private dialog: MatDialog) {
-    this.dataSource = new MatTableDataSource<Producto>(productos);
+  constructor(private snackBar: MatSnackBar, private productoService: ProductoService, private dialog: MatDialog) {
+    this.listarProductos();
   }
 
   editar(producto: Producto) {
     this.abrirFormulario(producto);
-    // this.productoService.geProducto(producto);
   }
+
+  // TODO modificar
   eliminar(producto: Producto) {
     console.log('Eliminar', producto);
   }
@@ -43,13 +45,31 @@ export class ProductosListComponent {
     this.abrirFormulario(null);
   }
 
+  listarProductos(): void {
+    this.productoService.listar().subscribe(productos => {
+      this.dataSource = new MatTableDataSource<Producto>(productos);
 
-  abrirFormulario(dato: Producto | null): void {
+      const todas = productos.map(p => p.categoria); // string[]
+      this.categoriasDisponibles = [...new Set(todas)];
+    });
+  }
+
+  abrirFormulario(producto: Producto | null): void {
     const dialogRef = this.dialog.open(ProductosFormComponent, {
       width: '95%',
       maxWidth: '600px',
-      data: dato,
-      panelClass: 'scrolling-dialog'
+      panelClass: 'scrolling-dialog',
+      data: {
+        producto,
+        categorias: this.categoriasDisponibles
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(resultado => {
+      if (resultado) {
+        // Solo si se guardó (y no se canceló) lista
+        this.listarProductos(); // o el método que uses para refrescar
+      }
     });
   }
 }

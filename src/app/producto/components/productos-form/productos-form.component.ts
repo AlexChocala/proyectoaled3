@@ -21,50 +21,58 @@ import { Observable, of } from 'rxjs';
 export class ProductosFormComponent {
 
   formularioProducto: FormGroup;
-  //TODO modificar para acceder a DB
-  categoria = ['Electrónica', 'Ropa', 'Libros', 'Hogar'];
   esEdicion = false;
+  categoria: string[] = [];
 
-  constructor(private dialogRef: MatDialogRef<ProductosFormComponent>,private snackBar: MatSnackBar, @Inject(MAT_DIALOG_DATA) public data: Producto, private productoService: ProductoService, private fb: FormBuilder) {
+  constructor(private dialogRef: MatDialogRef<ProductosFormComponent>, private snackBar: MatSnackBar, @Inject(MAT_DIALOG_DATA) public data: { producto: Producto, categorias: string[] }, private productoService: ProductoService, private fb: FormBuilder) {
     this.formularioProducto = this.fb.group({
       nombre: new FormControl('', [Validators.required, Validators.minLength(MIN_NOMBRE), Validators.maxLength(MAX_NOMBRE), Validators.pattern(PATRON_NOMBRE)]),
       descripcion: new FormControl('', [Validators.required, Validators.minLength(MIN_DESCRIPCION), Validators.maxLength(MAX_DESCRIPCION), Validators.pattern(PATRON_DESCRIPCION)]),
       precio: new FormControl('', [Validators.required, Validators.pattern(PATRON_PRECIO)]),
-      categoria: new FormControl('', [Validators.required]),
-      //TODO revisa imagen: new FormControl(null, [Validators.required, validarImagen()])
+      categoria: new FormControl('', [Validators.required, Validators.minLength(MIN_NOMBRE), Validators.maxLength(MAX_NOMBRE), Validators.pattern(PATRON_NOMBRE)]),
+      imagen: new FormControl('', Validators.required) //TODO VALIDA
     })
+
   }
 
+  // precargado de dato al iniciar
   ngOnInit(): void {
-    if (this.data) {
+    this.categoria = this.data.categorias;
+    if (this.data.producto) {
       this.esEdicion = true;
-      this.formularioProducto.patchValue(this.data);
+      this.formularioProducto.patchValue(this.data.producto);
     }
   }
 
+  //bloqueado hasta que sea valido desde el html
   registrar() {
     if (this.formularioProducto.valid) {
       const prod = this.formularioProducto.value as Producto;
 
-      // const accion$ = this.esEdicion
-      //   ? this.productoService.modificar(prod)
-      //   : this.productoService.agregar(prod);
+      const accion$ = this.esEdicion
+        ? this.productoService.modificar(prod)
+        : this.productoService.agregar(prod);
 
-      // accion$.subscribe({
-      //   next: () => {
-      //     const msg = this.esEdicion ? 'modificado' : 'agregado';
-      //     this.snackBar.open(`Producto ${msg} correctamente`, 'Cerrar', { duration: 3000 });
-      //     this.dialogRef.close(true);
-      //   },
-      //   error: () => {
-      //     this.snackBar.open('Ocurrió un error', 'Cerrar', { duration: 3000 });
-      //   }
-      // });
+      accion$.subscribe({
+        next: () => {
+          const msg = this.esEdicion ? 'modificado' : 'agregado';
+          this.snackBar.open(`Producto ${msg} correctamente`, 'Cerrar', { duration: 3000 });
+          this.dialogRef.close(prod); // o true, según necesites
+        },
+        error: (err) => {
+          // Analiza si hay un mensaje de error personalizado en la respuesta
+          const mensaje = err?.error?.message || 'Ocurrió un error inesperado.';
+          this.snackBar.open(mensaje, 'Cerrar', { duration: 4000 });
+          console.error(' Error del backend:', err);
+        }
+      });
+
     }
   }
 
   cancelar() {
     this.formularioProducto.reset(); // Limpia el formulario
+    this.dialogRef.close();
   }
 
   getError(controlName: string): string | null {
@@ -93,24 +101,3 @@ export class ProductosFormComponent {
 
 }
 
-
-function validarImagen(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const archivo = control.value;
-
-    if (!archivo) return null;
-
-    const tiposPermitidos = ['image/png', 'image/jpeg', 'image/webp'];
-    const maxTamaño = 2 * 1024 * 1024; // 2MB
-
-    if (archivo.size > maxTamaño) {
-      return { pesoExcesivo: true };
-    }
-
-    if (!tiposPermitidos.includes(archivo.type)) {
-      return { tipoInvalido: true };
-    }
-
-    return null;
-  };
-}

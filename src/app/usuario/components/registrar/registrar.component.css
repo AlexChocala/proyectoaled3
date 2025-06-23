@@ -1,25 +1,3 @@
-.titulo-alta,
-.titulo-modificar {
-  display: inline-block;
-  padding: 0.5rem 1.2rem;
-  border-radius: 20px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  text-align: center;
-  color: white;
-  margin: 0 auto;
-}
-
-.titulo-alta {
-  background-color: #1976d2;
-  /* Azul */
-}
-
-.titulo-modificar {
-  background-color: #2e7d32;
-  /* Verde */
-}
-
 .scrolling-dialog .mat-dialog-container {
   overflow-y: auto !important;
 }

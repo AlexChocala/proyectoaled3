@@ -31,17 +31,6 @@ function conMysql() {
   });
 }
 
-
-//TEST1
-const prueba = {
-  id: 5,
-  nombre: 'juan',
-  edad: 10
-}
-
-
-
-
 conMysql();
 
 /*
