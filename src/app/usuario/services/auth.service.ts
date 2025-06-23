@@ -1,24 +1,28 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
+import { Usuario } from '../classes/usuario';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiURL = 'http://localhost:4000/api/auth';
+  // TODO parche, separar de manera atomica
+  private apiURLauth = 'http://localhost:4000/api/auth';
+  private apiURLUsr = 'http://localhost:4000/api/usuarios';
+
   private tokenKey = 'auth_token';
 
   constructor(private http: HttpClient) { }
 
-  login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiURL}/login`, credentials).pipe(
+  login(credentials: { email: string; contrasena: string }): Observable<any> {
+    return this.http.post(`${this.apiURLauth}/login`, credentials).pipe(
       tap((res: any) => localStorage.setItem(this.tokenKey, res.token))
     );
   }
 
-  registrar(data: any): Observable<any> {
-    return this.http.post(`${this.apiURL}/register`, data);
+  registrar(data: Usuario): Observable<Usuario> {
+    return this.http.post<Usuario>(this.apiURLUsr, data);
   }
 
   logout(): void {

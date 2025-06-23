@@ -1,0 +1,36 @@
+.factura-container {
+  max-width: 700px;
+  margin: auto;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-factura {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.tabla-factura th,
+.tabla-factura td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.totales {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.cotizacion {
+  font-style: italic;
+  color: #555;
+}
+
+.acciones {
+  margin-top: 2rem;
+  text-align: right;
+}

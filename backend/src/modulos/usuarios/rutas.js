@@ -8,8 +8,11 @@ const router = express.Router();
 
 router.get('/',todos);
 router.get('/:id',uno);
-router.post('/',seguridad(),agregar);
-router.put('/',seguridad(),eliminar); 
+// router.post('/',seguridad(),agregar); //TODO solo el mismo usuario puede modificar sus datos
+// router.put('/',seguridad(),eliminar); 
+   router.post('/',agregar); //TODO solo el mismo usuario puede modificar sus datos
+   router.put('/',eliminar); 
+
 
 /*
 *---- PETICIONES-----

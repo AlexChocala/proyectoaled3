@@ -19,10 +19,10 @@ module.exports = function(dbInyectada) {
 
   async function agregar(body) {
     const usuario = {
-      id: body.id,
+      id: body.id ?? 0,
       nombre: body.nombre,
       email: body.email,
-      activo: body.activo
+      activo: body.activo !== undefined && body.activo !== null ? body.activo : 1
     }
     const respuesta = await db.agregar(TABLA, usuario);
     console.log(respuesta);
@@ -37,8 +37,8 @@ module.exports = function(dbInyectada) {
 
     if (body.nombre || body.contrasena) {
       await auth.agregar({
-        id: insertId,
-        usuario: body.nombre,
+        id: insertId ?? 0,
+        usuario: body.email,
         contrasena: body.contrasena
       });
     }

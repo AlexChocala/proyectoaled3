@@ -1,21 +1,21 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { CommonModule, NgClass } from '@angular/common';
-import { NgFor } from '@angular/common';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, NgFor, CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 export interface ProductoSeleccionado {
   nombre: string;
   cantidad: number;
-  precio: number; // en ARS
+  precio: number;
 }
 
 @Component({
   selector: 'app-factura',
-  imports: [NgFor, CurrencyPipe],
+  standalone: true,
+  imports: [MatIconModule ,CommonModule, NgFor, CurrencyPipe],
   templateUrl: './factura.component.html',
   styleUrl: './factura.component.css'
 })
@@ -27,42 +27,63 @@ export class FacturaComponent {
   totalUSD = 0;
   cotizacionDolar = 0;
 
-  constructor(private http: HttpClient, private snackBar: MatSnackBar) { }
+  constructor(private http: HttpClient, private snackBar: MatSnackBar) {}
 
   ngOnInit() {
     this.calcularTotales();
-    this.obtenerTipoDeCambio();
+    this.obtenerCotizacionBCRA();
   }
 
-  obtenerTipoDeCambio() {
-    this.http.get<any>('https://dolarapi.com/v1/dolares/oficial') // devuelve: { venta: 912, compra: 905 }
-      .subscribe(data => {
-        this.cotizacionDolar = data.venta;
-        this.totalUSD = this.totalARS / this.cotizacionDolar;
-      });
-  }
-
-  calcularTotales() {
-    this.totalARS = this.productos.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
+  calcularTotales(): void {
+    this.totalARS = this.productos.reduce(
+      (acc, p) => acc + p.precio * p.cantidad,
+      0
+    );
     if (this.cotizacionDolar) {
       this.totalUSD = this.totalARS / this.cotizacionDolar;
     }
   }
 
-  generarPDF() {
-    const elemento = document.getElementById('contenedorFactura');
+  obtenerCotizacionBCRA(): void {
+    const headers = new HttpHeaders({
+      Authorization: 'BEARER TU_TOKEN_AQUI' // ← reemplazá por tu token del BCRA
+    });
 
-    html2canvas(elemento!).then(canvas => {
+    this.http
+      .get<any[]>('https://api.estadisticasbcra.com/usd_of', { headers })
+      .subscribe({
+        next: (data) => {
+          const ultimo = data[data.length - 1];
+          this.cotizacionDolar = ultimo.v;
+          this.totalUSD = this.totalARS / this.cotizacionDolar;
+        },
+        error: (err) => {
+          this.snackBar.open('No se pudo obtener el dólar oficial 💸', 'Cerrar', {
+            duration: 3000
+          });
+          console.error('Error BCRA:', err);
+        }
+      });
+  }
+
+  generarPDF(): void {
+    const elemento = document.getElementById('contenedorFactura');
+    if (!elemento) return;
+
+    html2canvas(elemento).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF();
-      pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+      pdf.addImage(imgData, 'PNG', 10, 10, pageWidth - 20, pdfHeight);
       pdf.save('factura.pdf');
     });
   }
 
-  confirmar() {
+  confirmar(): void {
     this.generarPDF();
-    this.confirmarCompra.emit(); // Se lo comunicás al componente padre
+    this.confirmarCompra.emit();
     this.snackBar.open('✅ ¡Compra confirmada!', 'Cerrar', { duration: 3000 });
   }
 }

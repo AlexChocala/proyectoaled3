@@ -1,25 +1,37 @@
-<table>
-  <thead>
-    <tr>
-      <th>Producto</th>
-      <th>Cantidad</th>
-      <th>Precio ARS</th>
-      <th>Subtotal</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let p of productos">
-      <td>{{ p.nombre }}</td>
-      <td>{{ p.cantidad }}</td>
-      <td>{{ p.precio | currency:'ARS' }}</td>
-      <td>{{ p.precio * p.cantidad | currency:'ARS' }}</td>
-    </tr>
-  </tbody>
-</table>
-<div class="totales">
-  <p><strong>Total ARS:</strong>
-    {{ totalARS | currency:'ARS' }}</p>
-  <p><strong>Total USD:</strong>
-    {{ totalUSD | currency:'USD':'symbol':'1.2-2' }}</p>
+<div id="contenedorFactura" class="factura-container">
+  <mat-icon>receipt_long</mat-icon>
+  <h2>Detalle de la compra</h2>
+  <table class="tabla-factura">
+    <thead>
+      <tr>
+        <th>🛍 Producto</th>
+        <th>🔢 Cantidad</th>
+        <th>💵 Precio ARS</th>
+        <th>🧮 Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of productos">
+        <td>{{ p.nombre }}</td>
+        <td>{{ p.cantidad }}</td>
+        <td>{{ p.precio | currency:'ARS' }}</td>
+        <td>{{ p.precio * p.cantidad | currency:'ARS' }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="totales">
+    <p><strong>Total ARS:</strong>
+      {{ totalARS | currency:'ARS' }}</p>
+    <p><strong>Total USD:</strong>
+      {{ totalUSD | currency:'USD':'symbol':'1.2-2' }}</p>
+    <p class="cotizacion">💱 Cotización BCRA: {{ cotizacionDolar | currency:'ARS' }}</p>
+  </div>
+  <div class="acciones">
+    <button mat-raised-button color="primary" (click)="confirmar()">
+      <mat-icon>check_circle</mat-icon>
+      <h2>
+        Confirmar compra
+      </h2>
+    </button>
+  </div>
 </div>
-<button (click)="confirmar()">Confirmar compra</button>

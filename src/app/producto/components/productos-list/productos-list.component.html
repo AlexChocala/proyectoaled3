@@ -9,7 +9,8 @@
   <!-- Imagen -->
   <ng-container matColumnDef="imagen">
     <th mat-header-cell *matHeaderCellDef>
-      Imagen
+        <mat-icon>image</mat-icon> 
+       <p>IMAGEN</p>
     </th>
     <td mat-cell *matCellDef="let prod">
       <img [src]="prod.imagen" alt="Imagen producto" class="img-tabla" />
@@ -18,7 +19,8 @@
   <!-- Nombre -->
   <ng-container matColumnDef="nombre">
     <th mat-header-cell *matHeaderCellDef>
-      Nombre
+    <mat-icon>label</mat-icon>
+      <p>NOMBRE</p>
     </th>
     <td mat-cell *matCellDef="let prod">
       {{ prod.nombre }}
@@ -27,7 +29,8 @@
   <!-- Descripción -->
   <ng-container matColumnDef="descripcion">
     <th mat-header-cell *matHeaderCellDef>
-      Descripción
+    <mat-icon>notes</mat-icon>
+      <p>DESCRIPCION</p>
     </th>
     <td mat-cell *matCellDef="let prod">
       {{ prod.descripcion }}
@@ -36,7 +39,8 @@
   <!-- Precio -->
   <ng-container matColumnDef="precio">
     <th mat-header-cell *matHeaderCellDef>
-      Precio
+        <mat-icon>attach_money</mat-icon>
+      <p>PRECIO</p>
     </th>
     <td mat-cell *matCellDef="let prod">
       ${{ prod.precio }}
@@ -45,7 +49,8 @@
   <!-- Categoría -->
   <ng-container matColumnDef="categoria">
     <th mat-header-cell *matHeaderCellDef>
-      Categoría
+    <mat-icon>category</mat-icon> 
+    <p> CATEGORIA </p>
     </th>
     <td mat-cell *matCellDef="let prod">
       {{ prod.categoria }}
@@ -54,7 +59,7 @@
   <!-- Acciones -->
   <ng-container matColumnDef="accion">
     <th mat-header-cell *matHeaderCellDef>
-      Acción
+    <p>ACCION</p>
             <button mat-icon-button color="primary" (click)="agregar()">
         <mat-icon>add</mat-icon>
       </button>

@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-registrar',
@@ -17,7 +19,7 @@ export class RegistrarComponent {
   formularioLogin: FormGroup;
   verContrasena = false;
 
-  constructor(private authService: AuthService, private fb: FormBuilder) {
+  constructor(private router: Router, private snackBar: MatSnackBar ,private authService: AuthService, private fb: FormBuilder) {
     this.formularioLogin = this.fb.group({
       nombre: new FormControl('', [Validators.required, Validators.minLength(MIN_NOMBRE), Validators.maxLength(MAX_NOMBRE), Validators.pattern(PATRON_NOMBRE)]),
       email: new FormControl('', [Validators.required, Validators.minLength(MIN_EMAIL), Validators.maxLength(MAX_EMAIL), Validators.pattern(PATRON_EMAIL)]),
@@ -27,8 +29,20 @@ export class RegistrarComponent {
 
   confirmar() {
     if (this.formularioLogin.valid) {
-      let value = this.formularioLogin.value;
-      console.log(value);
+      const usuario = this.formularioLogin.value;
+      this.authService.registrar(usuario).subscribe({
+        next: () => {
+          this.snackBar.open('Registro exitoso', 'Cerrar', { duration: 3000 });
+          this.formularioLogin.reset();
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          alert(' Error al registrar: ' + (err.error?.mensaje || 'Verificá los datos.'));
+          this.snackBar.open('Error al registrar usuario', 'Cerrar', { duration: 3000 });
+          console.error('Error al registrar usuario:', err);
+
+        }
+      });
     }
 
   }

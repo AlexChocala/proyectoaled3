@@ -23,10 +23,6 @@ private readonly baseUrl = 'http://localhost:4000/api/productos';
     return this.http.put<void>(this.baseUrl , {id});
   }
 
-  // 📥 Listar todos
-  // listar(): Observable<Producto[]> {
-    // return this.http.get<Producto[]>(this.baseUrl);
-  // }
     // 📥 Listar todos (corrige acá)
   listar(): Observable<Producto[]> {
     return this.http.get<any>(this.baseUrl).pipe(
