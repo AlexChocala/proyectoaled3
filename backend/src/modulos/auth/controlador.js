@@ -1,8 +1,6 @@
-const TABLA = 'Auth';
-const bcrypt = require('bcrypt');
-const auth = require('../../auth');
+const TABLA = 'usuarios';
 
-module.exports = function(dbInyectada) {
+module.exports = function (dbInyectada) {
 
   let db = dbInyectada;
 
@@ -10,40 +8,62 @@ module.exports = function(dbInyectada) {
     db = require('../../DB/mysql');
   }
 
-
-  async function login(nombre, contrasena) {
-    const data = await db.query(TABLA, { usuario: nombre });
-    return bcrypt.compare(contrasena, data.contrasena)
-      .then(resultado => {
-        if (resultado === true) {
-          //generar token
-          return auth.asignarToken({ ...data });
-        } else {
-          throw new Error('informacion invalida');
-        }
-      })
+  function todos() {
+    return db.todos(TABLA);
   }
 
-  async function agregar(data) {
+  function uno(id) {
+    return db.uno(TABLA, id);
+  }
 
-    const authData = {
-      id: data.id,
+  async function register(body) {
+    try {
+      const usuario = {
+        id: body.id,
+        nombre: body.nombre,
+        apellido: body.apellido,
+        email: body.email,
+        contrasena: body.contrasena
+      }
+      const respuesta = await db.agregar(TABLA, usuario);
+      console.log(respuesta);
+      var insertId = 0;
+
+      if (body.id == 0) {
+        insertId = respuesta.insertId;
+      } else {
+        insertId = body.id;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('error en register:', error);
+      throw error;
     }
+  }
 
-    if (data.usuario) {
-      authData.usuario = data.usuario;
+  async function login(email, contrasena) {
+    try {
+      const usuario = await db.query(TABLA, { email });
+      if (!usuario) throw new Error('Usuario no encontrado');
+      if (usuario.contrasena !== contrasena) throw new Error('Contraseña incorrecta');
+      return { nombre: usuario.nombre, email: usuario.email, apellido: usuario.apellido };
+    } catch (error) {
+      console.error('error en login:', error);
+      throw error;
     }
+  }
 
-    if (data.contrasena) {
-      authData.contrasena = await bcrypt.hash(data.contrasena.toString(), 5);
-    }
-
-    return db.agregar(TABLA, authData);
+  function eliminar(body) {
+    return db.eliminar(TABLA, body);
   }
 
   return {
-    agregar,
-    login
+    todos,
+    uno,
+    register,
+    login,
+    eliminar
   }
 
 }

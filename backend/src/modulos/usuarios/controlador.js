@@ -17,33 +17,30 @@ module.exports = function(dbInyectada) {
     return db.uno(TABLA, id);
   }
 
-  async function agregar(body) {
-    const usuario = {
-      id: body.id,
-      nombre: body.nombre,
-      email: body.email,
-      activo: body.activo
-    }
-    const respuesta = await db.agregar(TABLA, usuario);
-    console.log(respuesta);
-    var insertId = 0;
-
-    if (body.id == 0) { //si es nuevo, devuelve el id de ese registro insertado
-      insertId = respuesta.insertId;
-    } else {
-      insertId = body.id;
-    }
-
-
-    if (body.nombre || body.contrasena) {
-      await auth.agregar({
-        id: insertId,
-        usuario: body.nombre,
+  async function register(body) {
+    try {
+      const usuario = {
+        id: body.id,
+        nombre: body.nombre,
+        apellido: body.apellido,
+        email: body.email,
         contrasena: body.contrasena
-      });
-    }
+      }
+      const respuesta = await db.agregar(TABLA, usuario);
+      console.log(respuesta);
+      var insertId = 0;
 
-    return true;
+      if (body.id == 0) {
+        insertId = respuesta.insertId;
+      } else {
+        insertId = body.id;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('error en register:', error);
+      throw error;
+    }
   }
 
   function eliminar(body) {
@@ -53,7 +50,7 @@ module.exports = function(dbInyectada) {
   return {
     todos,
     uno,
-    agregar,
+    register,
     eliminar
   }
 

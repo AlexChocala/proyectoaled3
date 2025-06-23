@@ -1,1 +1,40 @@
-<p>login works!</p>
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <!-- INPUT EMAIL -->
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="correo@ejemplo.com" required>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+            El correo no puede quedar vacío.
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+            Introduce un correo válido.
+        </mat-error>
+    </mat-form-field>
+
+    <!-- INPUT CONTRASEÑA -->
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Contraseña</mat-label>
+        <input matInput [type]="mostrarPassword ? 'text' : 'password'" formControlName="contrasena" required>
+        <button mat-icon-button matSuffix type="button" (click)="mostrarPassword = !mostrarPassword" tabindex="-1">
+            <mat-icon>{{ mostrarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="loginForm.get('contrasena')?.hasError('required')">
+            La contraseña es obligatoria.
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('contrasena')?.hasError('minlength')">
+            La contraseña debe tener al menos 6 caracteres.
+        </mat-error>
+    </mat-form-field>
+
+    <!-- BOTÓN LOGIN -->
+    <div class="buttons">
+        <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
+            Iniciar sesión
+        </button>
+    </div>
+</form>
+
+<!-- MENSAJE ERROR -->
+<div *ngIf="mensajeError" class="message-error" style="margin-top: 10px;">
+    {{ mensajeError }}
+</div>

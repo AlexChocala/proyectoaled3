@@ -1,31 +1,62 @@
 <form [formGroup]="formularioUsuario" (ngSubmit)="registrar()">
-  <!-- INPUT EMAIL -->
-  <mat-form-field appearance="outline">
-    <mat-label>Email</mat-label>
-    <input matInput type="email" formControlName="email" placeholder="carl@gmail.com" required>
-    @if (formularioUsuario.get('email')?.hasError('required')) {
-    <mat-error>El correo no puede quedar vacío.</mat-error>
-    }
-    @if (formularioUsuario.get('email')?.hasError('email')) {
-    <mat-error>Introduce un correo válido.</mat-error>
-    }
+  <!-- INPUT NOMBRE -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Nombre</mat-label>
+    <input matInput type="text" formControlName="nombre" placeholder="Nombre" required>
+    <mat-error *ngIf="formularioUsuario.get('nombre')?.hasError('required')">
+      El nombre es obligatorio.
+    </mat-error>
   </mat-form-field>
-  <!-- INPUT PASSWORD -->
-  <mat-form-field appearance="outline">
+
+  <!-- INPUT APELLIDO -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Apellido</mat-label>
+    <input matInput type="text" formControlName="apellido" placeholder="Apellido" required>
+    <mat-error *ngIf="formularioUsuario.get('apellido')?.hasError('required')">
+      El apellido es obligatorio.
+    </mat-error>
+  </mat-form-field>
+
+  <!-- INPUT EMAIL -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Email</mat-label>
+    <input matInput type="email" formControlName="email" placeholder="correo@ejemplo.com" required>
+    <mat-error *ngIf="formularioUsuario.get('email')?.hasError('required')">
+      El correo no puede quedar vacío.
+    </mat-error>
+    <mat-error *ngIf="formularioUsuario.get('email')?.hasError('email')">
+      Introduce un correo válido.
+    </mat-error>
+  </mat-form-field>
+
+  <!-- INPUT CONTRASEÑA -->
+  <mat-form-field appearance="outline" class="full-width">
     <mat-label>Contraseña</mat-label>
-    <input matInput [type]="mostrarPassword ? 'text' : 'password'" formControlName="password" required>
-    <button mat-icon-button matSuffix (click)="mostrarPassword = !mostrarPassword">
+    <input matInput [type]="mostrarPassword ? 'text' : 'password'" formControlName="contrasena" required>
+    <button mat-icon-button matSuffix type="button" (click)="mostrarPassword = !mostrarPassword" tabindex="-1">
       <mat-icon>{{ mostrarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
     </button>
-    @if (formularioUsuario.get('password')?.hasError('required')) {
-    <mat-error>La contraseña es obligatoria.</mat-error>
-    }
+    <mat-error *ngIf="formularioUsuario.get('contrasena')?.hasError('required')">
+      La contraseña es obligatoria.
+    </mat-error>
+    <mat-error *ngIf="formularioUsuario.get('contrasena')?.hasError('minlength')">
+      La contraseña debe tener al menos 6 caracteres.
+    </mat-error>
   </mat-form-field>
-  <!-- BOTONES CONFIRMAR Y CANCELAR -->
-  <button mat-raised-button color="primary" type="submit" [disabled]="formularioUsuario.invalid">
-    Confirmar
-  </button>
-  <button mat-button type="button" (click)="cancelar()">
-    Cancelar
-  </button>
+
+  <!-- BOTON REGISTRAR -->
+  <div class="buttons">
+    <button mat-raised-button color="primary" type="submit" [disabled]="formularioUsuario.invalid">
+      Registrar
+    </button>
+  </div>
 </form>
+
+<div *ngIf="mensajeExito" class="message-success" style="margin-top: 10px;">
+  {{ mensajeExito }}
+  <a routerLink="/login" style="cursor: pointer; color: blue; text-decoration: underline;">Iniciar sesión</a>
+</div>
+
+<div *ngIf="mensajeError" class="message-error" style="margin-top: 10px;">
+  {{ mensajeError }}
+</div>
