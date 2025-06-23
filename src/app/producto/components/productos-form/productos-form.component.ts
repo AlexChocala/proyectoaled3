@@ -47,11 +47,11 @@ export class ProductosFormComponent {
   //bloqueado hasta que sea valido desde el html
   registrar() {
     if (this.formularioProducto.valid) {
-      const prod = this.formularioProducto.value as Producto;
-
-      const accion$ = this.esEdicion
-        ? this.productoService.modificar(prod)
-        : this.productoService.agregar(prod);
+      let prod = this.formularioProducto.value as Producto;
+      if (this.esEdicion && this.data.producto?.id) {
+        prod = { ...prod, id: this.data.producto.id };
+      }
+      const accion$ = this.productoService.guardar(prod);
 
       accion$.subscribe({
         next: () => {

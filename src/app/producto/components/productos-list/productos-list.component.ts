@@ -37,7 +37,20 @@ export class ProductosListComponent {
 
   // TODO modificar
   eliminar(producto: Producto) {
-    console.log('Eliminar', producto);
+    const confirmacion = confirm(`¿Estás seguro de que querés eliminar el producto "${producto.nombre}"?`);
+
+    if (confirmacion) {
+      this.productoService.eliminar(producto.id).subscribe({
+        next: () => {
+          this.snackBar.open('Producto eliminado correctamente', 'Cerrar', { duration: 3000 });
+          this.listarProductos(); // actualiza la lista
+        },
+        error: (err) => {
+          this.snackBar.open('Error al eliminar el producto', 'Cerrar', { duration: 3000 });
+          console.error('Error eliminando producto:', err);
+        }
+      });
+    }
   }
 
   agregar() {

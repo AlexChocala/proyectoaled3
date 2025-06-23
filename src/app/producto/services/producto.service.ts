@@ -12,19 +12,15 @@ private readonly baseUrl = 'http://localhost:4000/api/productos';
 
   constructor(private http: HttpClient) { }
 
-  // 🆕 Crear producto
-  agregar(prod: Producto): Observable<Producto> {
+  // 🆕 Crear producto o //TODO modificar a futuro
+  // ✏️ Modificar producto existente backend decide
+  guardar(prod: Producto): Observable<Producto> {
     return this.http.post<Producto>(this.baseUrl, prod);
   }
 
-  // ✏️ Modificar producto existente
-  modificar(prod: Producto): Observable<Producto> {
-    return this.http.put<Producto>(`${this.baseUrl}/${prod.id}`, prod);
-  }
-
-  // 🗑 Eliminar por ID
+  // 🗑 Eliminar por ID TODO cambiar PUT por DELETE al igual que paramtros
   eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.http.put<void>(this.baseUrl , {id});
   }
 
   // 📥 Listar todos
