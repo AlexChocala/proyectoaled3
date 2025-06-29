@@ -1,69 +1,73 @@
 <!-- FILTRADOR -->
 <mat-form-field appearance="outline" class="filtro-responsive">
-<mat-label>Filtrar</mat-label>
-<input matInput [(ngModel)]="busqueda" placeholder="televisor">
+  <mat-label>Filtrar</mat-label>
+  <input matInput [(ngModel)]="busqueda" placeholder="televisor" />
 </mat-form-field>
 
-<table mat-table [dataSource]="dataSource.data | productoFiltrar: busqueda" class="mat-elevation-z3 full-width-table">
-<!-- <table mat-table [dataSource]="dataSource" class="mat-elevation-z3 full-width-table"> -->
+<table mat-table [dataSource]="productosFiltrados | productoFiltrar: busqueda"
+  class="mat-elevation-z3 full-width-table">
   <!-- Imagen -->
   <ng-container matColumnDef="imagen">
     <th mat-header-cell *matHeaderCellDef>
-        <mat-icon>image</mat-icon> 
-       <p>IMAGEN</p>
+      <mat-icon>image</mat-icon>
+      <p>IMAGEN</p>
     </th>
     <td mat-cell *matCellDef="let prod">
       <img [src]="prod.imagen" alt="Imagen producto" class="img-tabla" />
     </td>
   </ng-container>
+
   <!-- Nombre -->
   <ng-container matColumnDef="nombre">
     <th mat-header-cell *matHeaderCellDef>
-    <mat-icon>label</mat-icon>
+      <mat-icon>label</mat-icon>
       <p>NOMBRE</p>
     </th>
     <td mat-cell *matCellDef="let prod">
       {{ prod.nombre }}
     </td>
   </ng-container>
+
   <!-- Descripción -->
   <ng-container matColumnDef="descripcion">
     <th mat-header-cell *matHeaderCellDef>
-    <mat-icon>notes</mat-icon>
+      <mat-icon>notes</mat-icon>
       <p>DESCRIPCION</p>
     </th>
     <td mat-cell *matCellDef="let prod">
       {{ prod.descripcion }}
     </td>
   </ng-container>
+
   <!-- Precio -->
   <ng-container matColumnDef="precio">
     <th mat-header-cell *matHeaderCellDef>
-        <mat-icon>attach_money</mat-icon>
+      <mat-icon>attach_money</mat-icon>
       <p>PRECIO</p>
     </th>
     <td mat-cell *matCellDef="let prod">
       ${{ prod.precio }}
     </td>
   </ng-container>
+
   <!-- Categoría -->
   <ng-container matColumnDef="categoria">
     <th mat-header-cell *matHeaderCellDef>
-    <mat-icon>category</mat-icon> 
-    <p> CATEGORIA </p>
+      <mat-icon>category</mat-icon>
+      <p>CATEGORIA</p>
     </th>
     <td mat-cell *matCellDef="let prod">
       {{ prod.categoria }}
     </td>
   </ng-container>
+
   <!-- Acciones -->
   <ng-container matColumnDef="accion">
     <th mat-header-cell *matHeaderCellDef>
-    <p>ACCION</p>
-            <button mat-icon-button color="primary" (click)="agregar()">
+      <p>ACCION</p>
+      <button mat-icon-button color="primary" (click)="agregar()">
         <mat-icon>add</mat-icon>
       </button>
-
     </th>
     <td mat-cell *matCellDef="let prod">
       <button mat-icon-button color="primary" (click)="editar(prod)">
@@ -72,12 +76,59 @@
       <button mat-icon-button color="warn" (click)="eliminar(prod)">
         <mat-icon>delete</mat-icon>
       </button>
+      <!-- 🛒 Botón para agregar producto al carrito -->
+      <button mat-icon-button color="accent" (click)="agregarAlCarrito(prod)">
+        <mat-icon>add_shopping_cart</mat-icon>
+      </button>
     </td>
   </ng-container>
-  <tr
-    mat-header-row
-    *matHeaderRowDef="displayedColumns"
-  ></tr>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
 <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator> -->
+
+<div style="display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;">
+  <!-- FILTRADOR -->
+  <div style="width: 250px; min-width: 200px;">
+    <mat-form-field appearance="outline" class="filtro-responsive" style="width: 100%;">
+      <mat-label>Filtrar</mat-label>
+      <input matInput [(ngModel)]="busqueda" placeholder="televisor" />
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" style="margin-top: 1rem; width: 100%;" (click)="agregar()">
+      <mat-icon>add</mat-icon> Nuevo producto
+    </button>
+  </div>
+
+  <!-- GRID DE PRODUCTOS -->
+  <div style="flex: 1;">
+    <div class="producto-grid">
+      <div *ngFor="let prod of productosFiltrados | productoFiltrar: busqueda" class="producto-card mat-elevation-z3">
+        <img [src]="prod.imagen" alt="Imagen producto" class="producto-imagen" />
+        <div class="producto-contenido">
+          <h3>{{ prod.nombre }}</h3>
+          <p>{{ prod.descripcion }}</p>
+          <p><strong>${{ prod.precio }}</strong></p>
+          <p style="font-size: 0.9rem; color: gray;">{{ prod.categoria }}</p>
+        </div>
+        <div class="producto-acciones">
+          <button mat-icon-button color="primary" (click)="editar(prod)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="eliminar(prod)">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button mat-icon-button color="accent" (click)="agregarAlCarrito(prod)">
+            <mat-icon>add_shopping_cart</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="productosFiltrados.length === 0"
+        style="width: 100%; text-align: center; color: gray; margin-top: 4rem;">
+        No hay productos para mostrar.
+      </div>
+    </div>
+  </div>
+</div>

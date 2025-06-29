@@ -2,18 +2,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #213959;
+  background-color: #222222;
   color: white;
   padding: 0.7rem 1.2rem;
   font-family: 'Roboto', sans-serif;
   position: relative;
-  flex-wrap: wrap;
 }
 
 .navbar-left .logo {
   font-size: 1.4rem;
   font-weight: bold;
-  color: white;
+  color: white !important;
   text-decoration: none;
 }
 
@@ -26,7 +25,7 @@
 }
 
 .navbar-center a {
-  color: white;
+  color: white !important;
   text-decoration: none;
   font-weight: 500;
 }
@@ -43,15 +42,15 @@
 
 .user-icon {
   font-size: 1.3rem;
+  color: white !important;
 }
 
 .login-link {
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  color: white;
+  color: white !important;
   text-decoration: none;
-  cursor: pointer;
   font-weight: 500;
 }
 
@@ -59,57 +58,65 @@
   text-decoration: none;
 }
 
-.auth-button {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.user-email {
   font-weight: 500;
+  white-space: nowrap;
+  color: white !important;
 }
 
-.logout-icon {
-  background: none;
-  color: white;
-  cursor: pointer;
+.logout-icon mat-icon {
+  color: white !important;
 }
 
-.hamburger {
+/* Responsive: ocultamos centro en móviles y mostramos botón hamburguesa si quieres más tarde */
+@media (max-width: 768px) {
+  .navbar-center {
+    display: none;
+  }
+}
+
+/* Eliminar ripple y reforzar estilo minimalista */
+.mat-mdc-button .mdc-button__ripple,
+.mat-mdc-icon-button .mdc-icon-button__ripple {
   display: none;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .desktop-only {
-    display: none;
-  }
+.mat-mdc-button,
+.mat-mdc-icon-button {
+  background: none;
+  border: none;
+  color: white;
+  box-shadow: none;
+  transition: none;
+}
 
-  .mobile-only {
-    display: block;
-  }
+.navbar a,
+.navbar button,
+.navbar mat-icon {
+  color: white !important;
+}
 
-  .navbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+/* Quitar fondo circular al hacer hover sobre botones */
+.mat-mdc-button:not(:disabled):hover .mdc-button__label,
+.mat-mdc-icon-button:not(:disabled):hover .mdc-icon-button__focus-ring {
+  background-color: transparent !important;
+}
 
-  .navbar-right {
-    width: 100%;
-    justify-content: space-between;
-  }
+.mat-mdc-button:hover,
+.mat-mdc-icon-button:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
 
-  .user-email {
-    display: none;
-  }
-
-  .hamburger {
-    display: inline-block;
-  }
-
-  .navbar-center {
-    position: static;
-    transform: none;
-    margin-top: 0.5rem;
-    width: 100%;
-    justify-content: center;
-  }
+:host ::ng-deep .mat-mdc-button:hover .mdc-button__ripple::before,
+:host ::ng-deep .mat-mdc-button:hover .mdc-button__ripple::after,
+:host ::ng-deep .mat-mdc-icon-button:hover .mdc-icon-button__ripple::before,
+:host ::ng-deep .mat-mdc-icon-button:hover .mdc-icon-button__ripple::after {
+  background-color: transparent !important;
 }

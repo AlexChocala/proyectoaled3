@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -12,10 +13,23 @@ import { Producto } from '../../model/producto';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ProductoService } from '../../services/producto.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { CarritoService } from '../../../carrito/services/carrito.service';
 
 @Component({
   selector: 'app-productos-list',
-  imports: [MatSnackBarModule, ProductoFiltrarPipe, FormsModule, MatIconModule, MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatSnackBarModule,
+    ProductoFiltrarPipe,
+    FormsModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule
+  ],
   templateUrl: './productos-list.component.html',
   styleUrl: './productos-list.component.css'
 })
@@ -27,7 +41,12 @@ export class ProductosListComponent {
   esEdicion: boolean = false;
   categoriasDisponibles!: String[];
 
-  constructor(private snackBar: MatSnackBar, private productoService: ProductoService, private dialog: MatDialog) {
+  constructor(
+    private snackBar: MatSnackBar,
+    private productoService: ProductoService,
+    private dialog: MatDialog,
+    private carritoService: CarritoService // agregado para manejar el carrito
+  ) {
     this.listarProductos();
   }
 
@@ -84,5 +103,22 @@ export class ProductosListComponent {
         this.listarProductos(); // o el método que uses para refrescar
       }
     });
+  }
+
+  // botón agrega 1 unidad del producto al carrito
+  agregarAlCarrito(producto: Producto): void {
+    this.carritoService.agregarProducto({
+      nombre: producto.nombre,
+      precio: producto.precio,
+      cantidad: 1
+    });
+
+    this.snackBar.open(`${producto.nombre} agregado al carrito 🛒`, 'Cerrar', {
+      duration: 2500
+    });
+  }
+
+  get productosFiltrados(): Producto[] {
+    return this.dataSource?.data ?? [];
   }
 }

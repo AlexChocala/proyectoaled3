@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Observable, tap, BehaviorSubject } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 import { Usuario } from '../classes/usuario';
 
 @Injectable({
@@ -10,14 +11,30 @@ export class AuthService {
   // TODO parche, separar de manera atomica
   private apiURLauth = 'http://localhost:4000/api/auth';
   private apiURLUsr = 'http://localhost:4000/api/usuarios';
-
   private tokenKey = 'auth_token';
+  private isBrowser: boolean;
 
-  constructor(private http: HttpClient) { }
+  private _user = new BehaviorSubject<{ email: string } | null>(null);
+  user$ = this._user.asObservable();
+
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+    if (this.isBrowser) {
+      const token = this.getToken();
+      if (token) this.setUserFromToken(token);
+    }
+  }
 
   login(credentials: { email: string; contrasena: string }): Observable<any> {
     return this.http.post(`${this.apiURLauth}/login`, credentials).pipe(
-      tap((res: any) => localStorage.setItem(this.tokenKey, res.token))
+      tap((res: any) => {
+        if (!this.isBrowser) return;
+        localStorage.setItem(this.tokenKey, res.token);
+        this.setUserFromToken(res.token);
+      })
     );
   }
 
@@ -26,14 +43,20 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
+    if (this.isBrowser) localStorage.removeItem(this.tokenKey);
+    this._user.next(null);
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem(this.tokenKey);
+    return this.isBrowser && !!localStorage.getItem(this.tokenKey);
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return this.isBrowser ? localStorage.getItem(this.tokenKey) : null;
+  }
+
+  private setUserFromToken(token: string) {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    this._user.next({ email: payload.email });
   }
 }

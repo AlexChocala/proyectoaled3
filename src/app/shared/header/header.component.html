@@ -1,6 +1,41 @@
-<nav class="navbar">
-  <ul>
-    <li><a routerLink="/">INICIO</a></li>
-    <li><a routerLink="/login">R</a></li>
-  </ul>
-</nav>
+<mat-toolbar class="navbar">
+  <!-- IZQUIERDA: LOGO / INICIO -->
+  <div class="navbar-left">
+    <a mat-button disableRipple routerLink="/home" class="logo">AFTER STREET</a>
+  </div>
+
+  <!-- CENTRO: PRODUCTOS -->
+  <div class="navbar-center">
+    <a mat-button disableRipple routerLink="/producto-list">PRODUCTOS</a>
+  </div>
+
+  <!-- DERECHA: LOGIN o INFO_USUARIO + LOGOUT -->
+  <div class="navbar-right">
+    <!-- Si NO está logueado -->
+    <ng-container *ngIf="!isLoggedIn; else loggedTpl">
+      <button mat-button disableRipple class="login-link" routerLink="/login">
+        <mat-icon class="user-icon">account_circle</mat-icon>
+        <span>Iniciar sesión</span>
+      </button>
+    </ng-container>
+
+    <!-- Si ya está logueado -->
+    <ng-template #loggedTpl>
+      <div class="user-info">
+        <mat-icon class="user-icon">account_circle</mat-icon>
+        <span class="user-email">{{ userEmail }}</span>
+      </div>
+
+      <!-- Ícono de bolsita con contador -->
+      <button mat-icon-button aria-label="Ver carrito">
+        <mat-icon matBadge="{{ totalEnCarrito }}" matBadgeColor="warn" matBadgeHidden="{{ totalEnCarrito === 0 }}">
+          shopping_bag
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button disableRipple class="logout-icon" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </ng-template>
+  </div>
+</mat-toolbar>

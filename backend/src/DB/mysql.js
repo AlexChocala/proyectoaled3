@@ -15,7 +15,7 @@ function conMysql() {
   conexion.connect((err) => {
     if (err) {
       console.log(['db err'], err);
-      setTimeout(conMysql(), 200);
+      setTimeout(conMysql, 200);;
     } else {
       console.log('db conectado');
     }
