@@ -1,19 +1,19 @@
 const express = require('express');
-
-const respuesta = require('../../red/respuestas')
-const controlador = require('./index');
-
 const router = express.Router();
+const controlador = require('./controlador')();
 
-//logearse
-router.get('/login', login);
+router.post('/login', async (req, res) => {
+  const { email, contrasena } = req.body;
 
-async function login(req, res, next) {
-  try {
-    const token = await controlador.login(req.body.nombre, req.body.contrasena);
-    respuesta.success(req, res, token, 200);
-  } catch (err) { next(err); }
+  const resultado = await controlador.login(email, contrasena);
 
-}
+  if (resultado.error) {
+    const mensaje = resultado.message || 'Error';
+    const status = mensaje.includes('contraseña') || mensaje.includes('Usuario') ? 401 : 500;
+    return res.status(status).json({ error: true, message: mensaje });
+  }
+
+  return res.json({ token: resultado.token });
+});
 
 module.exports = router;

@@ -17,15 +17,10 @@
     <mat-form-field appearance="outline">
       <mat-label>CONTRASEÑA</mat-label>
       <mat-icon matPrefix>lock</mat-icon>
-      <!-- <input matInput [type]="verContrasena ? 'text' : 'password'" formControlName="contrasena" placeholder="••••••••" required> -->
-      <input matInput [type]="hide() ? 'password' : 'text'" formControlName="contrasena" placeholder="••••••••" required>
-      <button
-        matIconButton
-        matSuffix
-        (click)="clickEvent($event)"
-        [attr.aria-label]="'Hide password'"
-        [attr.aria-pressed]="hide()"
-      >
+      <input matInput [type]="hide() ? 'password' : 'text'" formControlName="contrasena" placeholder="••••••••"
+        required>
+      <button matIconButton matSuffix (click)="clickEvent($event)" [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="hide()">
         <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
       </button>
       <!-- MI PLANTILLA -->
@@ -38,7 +33,14 @@
     <button mat-button type="button" (click)="cancelar()">
       Cancelar
     </button>
+
+    <!-- TEXTO DE NAVEGACION ENTRE LOGIN Y REGISTRO -->
+    <p class="switch-form-text">
+      ¿No tienes una cuenta?
+      <a class="link-switch" (click)="irARegistro()">Regístrate</a>
+    </p>
   </form>
+
   <!-- PLANTILLA REUTILIZABLE -->
   <ng-template #validaCampo let-campo="campo">
     @if (getError(campo)) {

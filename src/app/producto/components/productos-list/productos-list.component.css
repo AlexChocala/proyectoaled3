@@ -47,6 +47,28 @@
   margin-top: 1rem;
 }
 
+.boton-nuevo-producto {
+  margin-top: 2rem;
+  width: 100%;
+  background-color: #4caf50 !important; /* verde */
+  color: white !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  gap: 8px; /* espacio entre texto e icono */
+}
+
+.boton-nuevo-producto:hover {
+  background-color: #45a049 !important; /* verde un poco más oscuro al hover */
+}
+
+.icono-agregar {
+  font-size: 20px;
+  /* Si querés, podés ajustar margen aquí en vez de usar gap */
+}
+
 /* RESPONSIVE para pantallas pequeñas */
 @media (max-width: 768px) {
   .producto-grid {

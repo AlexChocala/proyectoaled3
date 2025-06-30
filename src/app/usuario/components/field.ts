@@ -11,6 +11,12 @@ export const PATRON_CONTRASENA = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/
 export const MIN_CONTRASENA = 12;
 export const MAX_CONTRASENA = 20;
 
+// APELLIDO
+export const PATRON_APELLIDO = /^[A-Za-zÁÉÍÓÚáéíóúÑñ'´\- ]+$/;
+export const MIN_APELLIDO = 2;
+export const MAX_APELLIDO = 50;
+
+// CAMPOS
 export const CAMPOS = [
   {
     campo: 'nombre',
@@ -19,7 +25,13 @@ export const CAMPOS = [
     patron: PATRON_NOMBRE,
     mensaje: "solo letras y espacios"
   },
-  
+  {
+    campo: 'apellido',
+    min: MIN_APELLIDO,
+    max: MAX_APELLIDO,
+    patron: PATRON_APELLIDO,
+    mensaje: "solo letras y espacios"
+  },
   {
     campo: 'email',
     min: MIN_EMAIL,

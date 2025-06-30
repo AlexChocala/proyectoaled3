@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-config = require('../config');
+const config = require('../config');
+const bcrypt = require('bcrypt'); // agregué bcrypt para hash y comparación
 const secret = config.jwt.secret;
 
 function asignarToken(data) {
@@ -13,6 +14,8 @@ function verificarToken(token) {
 const chequearToken = {
   confirmarToken: function(req) {
     const decodificado = decodificarCabecera(req);
+    // modifiqué esto para que asigne user al request
+    req.user = decodificado;
   }
 }
 
@@ -41,7 +44,32 @@ function decodificarCabecera(req) {
   return decodificado;
 }
 
+// agregué función login para validar email y contraseña con bcrypt
+async function login(email, contrasena) {
+  // modifiqué para consultar tabla Auth y validar contraseña hasheada
+  const db = require('../DB/mysql');
+  const registro = await db.query('Auth', { usuario: email });
+  if (!registro) return null;
+
+  const match = await bcrypt.compare(contrasena, registro.contrasena);
+  if (!match) return null;
+
+  // modifiqué para crear token JWT con email y expiración 1 hora
+  const token = jwt.sign({ email }, secret, { expiresIn: '1h' });
+  return token;
+}
+
+// agregué función para agregar nuevo registro en Auth con hash
+async function agregar({ id, usuario, contrasena }) {
+  // modifiqué para agregar datos a tabla Auth
+  const db = require('../DB/mysql');
+  const data = { id, usuario, contrasena };
+  return db.agregar('Auth', data);
+}
+
 module.exports = {
   asignarToken,
-  chequearToken 
+  chequearToken,
+  login,      // modifiqué para exportar función login
+  agregar     // modifiqué para exportar función agregar
 }

@@ -14,7 +14,7 @@
     <!-- Si NO está logueado -->
     <ng-container *ngIf="!isLoggedIn; else loggedTpl">
       <button mat-button disableRipple class="login-link" routerLink="/login">
-        <mat-icon class="user-icon">account_circle</mat-icon>
+        <mat-icon class="user-icon">person</mat-icon>
         <span>Iniciar sesión</span>
       </button>
     </ng-container>
@@ -22,7 +22,7 @@
     <!-- Si ya está logueado -->
     <ng-template #loggedTpl>
       <div class="user-info">
-        <mat-icon class="user-icon">account_circle</mat-icon>
+        <mat-icon class="user-icon">person</mat-icon>
         <span class="user-email">{{ userEmail }}</span>
       </div>
 

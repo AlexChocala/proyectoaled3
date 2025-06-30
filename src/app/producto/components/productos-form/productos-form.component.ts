@@ -22,7 +22,9 @@ export class ProductosFormComponent {
 
   formularioProducto: FormGroup;
   esEdicion = false;
-  categoria: string[] = [];
+
+  // agregué esto para lista de stock del 1 al 100 (para el select)
+  numerosStock: number[] = Array.from({ length: 100 }, (_, i) => i + 1);
 
   constructor(private dialogRef: MatDialogRef<ProductosFormComponent>, private snackBar: MatSnackBar, @Inject(MAT_DIALOG_DATA) public data: { producto: Producto, categorias: string[] }, private productoService: ProductoService, private fb: FormBuilder) {
     this.formularioProducto = this.fb.group({
@@ -30,14 +32,15 @@ export class ProductosFormComponent {
       descripcion: new FormControl('', [Validators.required, Validators.minLength(MIN_DESCRIPCION), Validators.maxLength(MAX_DESCRIPCION), Validators.pattern(PATRON_DESCRIPCION)]),
       precio: new FormControl('', [Validators.required, Validators.pattern(PATRON_PRECIO)]),
       categoria: new FormControl('', [Validators.required, Validators.minLength(MIN_NOMBRE), Validators.maxLength(MAX_NOMBRE), Validators.pattern(PATRON_NOMBRE)]),
+      stock: new FormControl('', [Validators.required]), // agregado para stock obligatorio
       imagen: new FormControl('', Validators.required) //TODO VALIDA
     })
-
   }
 
-  // precargado de dato al iniciar
+  categorias: string[] = []; // modifiqué para que coincida con nombre plural
+
   ngOnInit(): void {
-    this.categoria = this.data.categorias;
+    this.categorias = this.data.categorias; // asigna las categorías recibidas desde el dialogo
     if (this.data.producto) {
       this.esEdicion = true;
       this.formularioProducto.patchValue(this.data.producto);
@@ -100,4 +103,3 @@ export class ProductosFormComponent {
   }
 
 }
-

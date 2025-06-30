@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ProductoService {
 
-private readonly baseUrl = 'http://localhost:4000/api/productos';
+  private readonly baseUrl = 'http://localhost:4000/api/productos';
 
   constructor(private http: HttpClient) { }
 
@@ -18,12 +18,12 @@ private readonly baseUrl = 'http://localhost:4000/api/productos';
     return this.http.post<Producto>(this.baseUrl, prod);
   }
 
-  // 🗑 Eliminar por ID TODO cambiar PUT por DELETE al igual que paramtros
+  // 🗑 Eliminar por ID TODO cambiar PUT por DELETE al igual que parámetros
   eliminar(id: number): Observable<void> {
     return this.http.put<void>(this.baseUrl , {id});
   }
 
-    // 📥 Listar todos (corrige acá)
+  // 📥 Listar todos (corrige acá)
   listar(): Observable<Producto[]> {
     return this.http.get<any>(this.baseUrl).pipe(
       map(res => res.body) // ⬅️ Extrae solamente el array de productos
@@ -35,4 +35,8 @@ private readonly baseUrl = 'http://localhost:4000/api/productos';
     return this.http.get<Producto>(`${this.baseUrl}/${id}`);
   }
 
+  // 🆕 Nuevo método para obtener todas las categorías desde backend
+  obtenerCategorias(): Observable<string[]> {
+    return this.http.get<string[]>('http://localhost:4000/api/productos/categorias');
+  }
 }

@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../services/auth.service';
 import { CAMPOS, MAX_CONTRASENA, MAX_EMAIL, MIN_CONTRASENA, MIN_EMAIL, PATRON_CONTRASENA, PATRON_EMAIL } from '../field';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,7 @@ export class LoginComponent {
   formularioLogin: FormGroup;
   verContrasena = false;
 
-  constructor(private authService: AuthService, private fb: FormBuilder) {
+  constructor(private authService: AuthService, private fb: FormBuilder, private router: Router) {
     this.formularioLogin = this.fb.group({
       email: new FormControl('', [Validators.required, Validators.minLength(MIN_EMAIL), Validators.maxLength(MAX_EMAIL), Validators.pattern(PATRON_EMAIL)]),
       contrasena: new FormControl('', [Validators.required, Validators.minLength(MIN_CONTRASENA), Validators.maxLength(MAX_CONTRASENA), Validators.pattern(PATRON_CONTRASENA)]),
@@ -27,14 +28,30 @@ export class LoginComponent {
   confirmar() {
     if (this.formularioLogin.valid) {
       let value = this.formularioLogin.value;
-      console.log(value);
-    }
 
+      // modifiqué esto para que email y contraseña se limpien de espacios y comillas dobles al inicio y final
+      value.email = value.email.trim();
+      value.contrasena = value.contrasena.trim().replace(/^"+|"+$/g, '');
+
+      console.log(value);
+
+      // agregué esto para que se haga el login real al backend
+      this.authService.login(value).subscribe({
+        next: (res) => {
+          console.log('Login exitoso:', res);
+          // agregué esto para redirigir al home al iniciar sesión
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          console.error('Error en login:', err);
+          alert('Error al iniciar sesión. Verificá tus credenciales.');
+        }
+      });
+    }
   }
 
-
   cancelar() {
-    this.formularioLogin.reset;
+    this.formularioLogin.reset();
   }
 
   // ocultar contraseña
@@ -42,6 +59,10 @@ export class LoginComponent {
   clickEvent(event: MouseEvent) {
     this.hide.set(!this.hide());
     event.stopPropagation();
+  }
+
+  irARegistro() {
+    this.router.navigate(['/registrar']);
   }
 
   getError(controlName: string): string | null {
@@ -66,8 +87,5 @@ export class LoginComponent {
     return CAMPOS.find(r => r.campo === campo)?.[propiedad];
   }
 }
-
-
-
 
 

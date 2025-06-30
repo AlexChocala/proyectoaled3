@@ -56,7 +56,24 @@ export class AuthService {
   }
 
   private setUserFromToken(token: string) {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+  try {
+    if (!token) {
+      this._user.next(null);
+      return;
+    }
+    const base64Url = token.split('.')[1];
+    if (!base64Url) {
+      this._user.next(null);
+      return;
+    }
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // para base64url a base64 estándar
+    const payload = JSON.parse(atob(base64));
     this._user.next({ email: payload.email });
+  } catch (error) {
+    console.error('Error decoding token', error);
+    this._user.next(null);
   }
 }
+  
+}
+

@@ -22,20 +22,17 @@
   padding-right: 0.5rem;
 }
 
-
 .btn-confirmar:disabled {
   background-color: #ccc;
   color: #666;
   cursor: not-allowed;
 }
 
-
 button[mat-raised-button]:disabled {
   background-color: #ccc;
   color: #777;
   cursor: not-allowed;
 }
-
 
 .formulario-contenedor {
   max-width: 500px;
@@ -55,4 +52,24 @@ button[mat-raised-button]:disabled {
   .formulario-contenedor {
     padding: 1rem;
   }
+}
+
+/* Texto para cambiar entre registro y login */
+.switch-form-text {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center;
+}
+
+.link-switch {
+  color: #1976d2;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 0.3rem;
+}
+
+.link-switch:hover {
+  text-decoration: underline;
 }

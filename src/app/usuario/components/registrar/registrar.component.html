@@ -9,11 +9,21 @@
     <!-- INPUT NOMBRE -->
     <mat-form-field appearance="outline">
       <mat-label>NOMBRE</mat-label>
-      <mat-icon matPrefix>user</mat-icon>
+      <mat-icon matPrefix>account_circle</mat-icon>
       <input matInput type="text" formControlName="nombre" placeholder="ROBERTO" required>
       <!-- MI PLANTILLA -->
       <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'nombre' }"></ng-container>
     </mat-form-field>
+
+    <!-- INPUT APELLIDO -->
+    <mat-form-field appearance="outline">
+      <mat-label>APELLIDO</mat-label>
+      <mat-icon matPrefix>badge</mat-icon>
+      <input matInput type="text" formControlName="apellido" placeholder="PEREZ" required>
+      <!-- MI PLANTILLA -->
+      <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'apellido' }"></ng-container>
+    </mat-form-field>
+
     <!-- INPUT EMAIL -->
     <mat-form-field appearance="outline">
       <mat-label>EMAIL</mat-label>
@@ -22,24 +32,21 @@
       <!-- MI PLANTILLA -->
       <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'email' }"></ng-container>
     </mat-form-field>
+
     <!-- INPUT CONTRASENA-->
     <mat-form-field appearance="outline">
       <mat-label>CONTRASEÑA</mat-label>
       <mat-icon matPrefix>lock</mat-icon>
-      <!-- <input matInput [type]="verContrasena ? 'text' : 'password'" formControlName="contrasena" placeholder="••••••••" required> -->
-      <input matInput [type]="hide() ? 'password' : 'text'" formControlName="contrasena" placeholder="••••••••" required>
-      <button
-        matIconButton
-        matSuffix
-        (click)="clickEvent($event)"
-        [attr.aria-label]="'Hide password'"
-        [attr.aria-pressed]="hide()"
-      >
+      <input matInput [type]="hide() ? 'password' : 'text'" formControlName="contrasena" placeholder="••••••••"
+        required>
+      <button matIconButton matSuffix (click)="clickEvent($event)" [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="hide()">
         <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
       </button>
       <!-- MI PLANTILLA -->
       <ng-container *ngTemplateOutlet="validaCampo; context: { campo: 'contrasena' }"></ng-container>
     </mat-form-field>
+
     <!-- BOTONES FINALES -->
     <button mat-raised-button color="primary" type="submit" [disabled]="formularioLogin.invalid">
       Confirmar
@@ -47,7 +54,14 @@
     <button mat-button type="button" (click)="cancelar()">
       Cancelar
     </button>
+
+    <!-- TEXTO DE NAVEGACION ENTRE REGISTRO Y LOGIN -->
+    <p class="switch-form-text">
+      ¿Ya tienes una cuenta?
+      <a class="link-switch" (click)="irALogin()">Iniciar sesión</a>
+    </p>
   </form>
+
   <!-- PLANTILLA REUTILIZABLE -->
   <ng-template #validaCampo let-campo="campo">
     @if (getError(campo)) {

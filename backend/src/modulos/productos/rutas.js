@@ -1,17 +1,20 @@
 const express = require('express');
 
-const respuesta = require('../../red/respuestas')
+const respuesta = require('../../red/respuestas');
 const controlador = require('./index');
 
 const router = express.Router();
 
-router.get('/',todos);
-router.get('/:id',uno);
-router.post('/',agregar);
-router.put('/',eliminar); //TODO revisar funcionamiuento id
+router.get('/', todos);
+router.get('/:id', uno);
+router.post('/', agregar);
+router.put('/', eliminar); //TODO revisar funcionamiuento id
+
+// 🆕 Ruta para obtener todas las categorías únicas
+router.get('/categorias', categorias);
 
 /*
-*---- PETICIONES-----
+*---- PETICIONES----- 
 */
 
 async function todos(req, res ,next) {
@@ -21,10 +24,9 @@ async function todos(req, res ,next) {
   } catch(err) {
     next(err);
   }
-
 };
 
- async function uno(req, res, next) {
+async function uno(req, res, next) {
   try {
     const elementos = await controlador.uno(req.params.id);
     respuesta.success(req, res, elementos, 200);
@@ -33,8 +35,7 @@ async function todos(req, res ,next) {
   }
 };
 
-
- async function agregar(req, res, next) {
+async function agregar(req, res, next) {
   try {
     const elementos = await controlador.agregar(req.body);
 
@@ -49,8 +50,7 @@ async function todos(req, res ,next) {
   }
 };
 
-
- async function eliminar(req, res, next) {
+async function eliminar(req, res, next) {
   try {
     const elementos = await controlador.eliminar(req.body);
     respuesta.success(req, res, 'elemento eliminado correctamete', 200);
@@ -58,5 +58,15 @@ async function todos(req, res ,next) {
     next(err);
   }
 };
+
+// 🆕 Controlador para devolver categorías únicas
+async function categorias(req, res, next) {
+  try {
+    const categorias = await controlador.obtenerCategorias();
+    respuesta.success(req, res, categorias, 200);
+  } catch (err) {
+    next(err);
+  }
+}
 
 module.exports = router;

@@ -15,7 +15,7 @@ function conMysql() {
   conexion.connect((err) => {
     if (err) {
       console.log(['db err'], err);
-      setTimeout(conMysql, 200);;
+      setTimeout(conMysql(), 200);
     } else {
       console.log('db conectado');
     }
@@ -55,9 +55,13 @@ function uno(tabla, id) {
 
 function agregar(tabla, data) {
   return new Promise((resolve, reject) => {
-    conexion.query(`INSERT INTO ${tabla} SET ? ON DUPLICATE KEY UPDATE ?`, [data, data], (error, result) => {
-      return error ? reject(error) : resolve(result);
-    });
+    conexion.query(
+      `INSERT INTO ${tabla} SET ? ON DUPLICATE KEY UPDATE ?`,
+      [data, data],
+      (error, result) => {
+        return error ? reject(error) : resolve(result);
+      }
+    );
   });
 }
 
@@ -74,7 +78,7 @@ function eliminar(tabla, data) {
 function query(tabla, consulta) {
   return new Promise((resolve, reject) => {
     conexion.query(`SELECT * FROM ${tabla} WHERE ?`, consulta, (error, result) => {
-      return error ? reject(error) : resolve(result[0]);
+      return error ? reject(error) : resolve(result);
     });
   });
 }

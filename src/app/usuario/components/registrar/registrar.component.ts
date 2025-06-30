@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { CAMPOS, MAX_CONTRASENA, MAX_EMAIL, MAX_NOMBRE, MIN_CONTRASENA, MIN_EMAIL, MIN_NOMBRE, PATRON_CONTRASENA, PATRON_EMAIL, PATRON_NOMBRE } from '../field';
+import { CAMPOS, MAX_CONTRASENA, MAX_EMAIL, MAX_NOMBRE, MAX_APELLIDO, MIN_CONTRASENA, MIN_EMAIL, MIN_NOMBRE, MIN_APELLIDO, PATRON_CONTRASENA, PATRON_EMAIL, PATRON_NOMBRE, PATRON_APELLIDO } from '../field';
 import { AuthService } from '../../services/auth.service';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -22,6 +22,10 @@ export class RegistrarComponent {
   constructor(private router: Router, private snackBar: MatSnackBar ,private authService: AuthService, private fb: FormBuilder) {
     this.formularioLogin = this.fb.group({
       nombre: new FormControl('', [Validators.required, Validators.minLength(MIN_NOMBRE), Validators.maxLength(MAX_NOMBRE), Validators.pattern(PATRON_NOMBRE)]),
+
+      // agregué esto porque faltaba el campo de APELLIDO en el formulario
+      apellido: new FormControl('', [Validators.required, Validators.minLength(MIN_APELLIDO), Validators.maxLength(MAX_APELLIDO), Validators.pattern(PATRON_APELLIDO)]),
+
       email: new FormControl('', [Validators.required, Validators.minLength(MIN_EMAIL), Validators.maxLength(MAX_EMAIL), Validators.pattern(PATRON_EMAIL)]),
       contrasena: new FormControl('', [Validators.required, Validators.minLength(MIN_CONTRASENA), Validators.maxLength(MAX_CONTRASENA), Validators.pattern(PATRON_CONTRASENA)]),
     })
@@ -31,25 +35,24 @@ export class RegistrarComponent {
     if (this.formularioLogin.valid) {
       const usuario = this.formularioLogin.value;
       this.authService.registrar(usuario).subscribe({
-        next: () => {
-          this.snackBar.open('Registro exitoso', 'Cerrar', { duration: 3000 });
+        next: (res) => {
+          // modifiqué esto para mostrar snackBar con acción para ir a login
+          this.snackBar.open('Usuario registrado! ✅ Inicia sesión', 'Iniciar sesión', { duration: 5000 })
+            .onAction().subscribe(() => {
+              this.router.navigate(['/login']);
+            });
           this.formularioLogin.reset();
-          this.router.navigate(['/login']);
         },
         error: (err) => {
-          alert(' Error al registrar: ' + (err.error?.mensaje || 'Verificá los datos.'));
-          this.snackBar.open('Error al registrar usuario', 'Cerrar', { duration: 3000 });
-          console.error('Error al registrar usuario:', err);
-
+          // modifiqué para mostrar error con snackBar
+          this.snackBar.open('Error al registrar usuario: ' + (err.error?.mensaje || 'Verificá los datos.'), 'Cerrar', { duration: 4000 });
         }
       });
     }
-
   }
 
-
   cancelar() {
-    this.formularioLogin.reset;
+    this.formularioLogin.reset();
   }
 
   // ocultar contraseña
@@ -57,6 +60,10 @@ export class RegistrarComponent {
   clickEvent(event: MouseEvent) {
     this.hide.set(!this.hide());
     event.stopPropagation();
+  }
+
+  irALogin() {
+    this.router.navigate(['/login']);
   }
 
   getError(controlName: string): string | null {
@@ -80,5 +87,5 @@ export class RegistrarComponent {
   ): (typeof CAMPOS)[number][T] | undefined {
     return CAMPOS.find(r => r.campo === campo)?.[propiedad];
   }
-
 }
+

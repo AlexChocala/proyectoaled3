@@ -8,12 +8,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { ProductoFiltrarPipe } from '../../pipe/producto-filtrar.pipe';
+import { CategoriaFiltrarPipe } from '../../pipe/categoria-filtrar.pipe'; // agregué esto para filtrar por categoría
 import { ProductosFormComponent } from '../productos-form/productos-form.component';
 import { Producto } from '../../model/producto';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ProductoService } from '../../services/producto.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CarritoService } from '../../../carrito/services/carrito.service';
+
+// agregué import para detectar si el usuario está logueado
+import { AuthService } from '../../../usuario/services/auth.service';
 
 @Component({
   selector: 'app-productos-list',
@@ -22,6 +26,7 @@ import { CarritoService } from '../../../carrito/services/carrito.service';
     CommonModule,
     MatSnackBarModule,
     ProductoFiltrarPipe,
+    CategoriaFiltrarPipe, // agregué esto para que funcione el pipe en el HTML
     FormsModule,
     MatIconModule,
     MatFormFieldModule,
@@ -31,7 +36,7 @@ import { CarritoService } from '../../../carrito/services/carrito.service';
     MatPaginatorModule
   ],
   templateUrl: './productos-list.component.html',
-  styleUrl: './productos-list.component.css'
+  styleUrls: ['./productos-list.component.css'] // corregí de styleUrl a styleUrls
 })
 export class ProductosListComponent {
   displayedColumns = ['imagen', 'nombre', 'descripcion', 'precio', 'categoria', 'accion'];
@@ -39,15 +44,26 @@ export class ProductosListComponent {
   busqueda: string = '';
   productoParaEditar: Producto | null = null;
   esEdicion: boolean = false;
-  categoriasDisponibles!: String[];
+  categoriasDisponibles: string[] = ['Buzos', 'Remeras', 'Camperas', 'Pantalones', 'Zapatillas'];
+
+  categoriaSeleccionada: string = ''; // agregué esto para guardar la categoría seleccionada del filtro
+
+  // agregué variable para saber si el usuario está logueado
+  estaLogueado: boolean = false;
 
   constructor(
     private snackBar: MatSnackBar,
     private productoService: ProductoService,
     private dialog: MatDialog,
-    private carritoService: CarritoService // agregado para manejar el carrito
+    private carritoService: CarritoService, // agregado para manejar el carrito
+    private authService: AuthService // agregué esto para detectar estado de sesión
   ) {
     this.listarProductos();
+
+    // agregué para actualizar estado de login y controlar visibilidad botones
+    this.authService.user$.subscribe(user => {
+      this.estaLogueado = !!user; // true si usuario logueado, false si no
+    });
   }
 
   editar(producto: Producto) {
@@ -56,7 +72,7 @@ export class ProductosListComponent {
 
   // TODO modificar
   eliminar(producto: Producto) {
-    const confirmacion = confirm(`¿Estás seguro de que querés eliminar el producto "${producto.nombre}"?`);
+    const confirmacion = confirm(`¿Estás seguro de que querés eliminar el producto "${producto.nombre}"?`); // corregido: comillas
 
     if (confirmacion) {
       this.productoService.eliminar(producto.id).subscribe({
@@ -80,9 +96,11 @@ export class ProductosListComponent {
   listarProductos(): void {
     this.productoService.listar().subscribe(productos => {
       this.dataSource = new MatTableDataSource<Producto>(productos);
-
-      const todas = productos.map(p => p.categoria); // string[]
-      this.categoriasDisponibles = [...new Set(todas)];
+      // No sobrescribo categoriasDisponibles para que siempre estén fijas
+      // this.categoriasDisponibles = [...new Set(productos.map(p => p.categoria.toString()))];
+    }, error => {
+      // En caso de error, igual mantengo las categorías fijas
+      this.categoriasDisponibles = ['Buzos', 'Remeras', 'Camperas', 'Pantalones', 'Zapatillas'];
     });
   }
 
@@ -113,12 +131,17 @@ export class ProductosListComponent {
       cantidad: 1
     });
 
-    this.snackBar.open(`${producto.nombre} agregado al carrito 🛒`, 'Cerrar', {
+    this.snackBar.open(`${producto.nombre} agregado al carrito 🛒`, 'Cerrar', { // corregido: backticks
       duration: 2500
     });
   }
 
+  // getter usado en el HTML para recorrer productos sin error
   get productosFiltrados(): Producto[] {
     return this.dataSource?.data ?? [];
+  }
+
+  seleccionarCategoria(categoria: string): void {
+    this.categoriaSeleccionada = categoria; // agregué esto para actualizar el filtro de categoría
   }
 }

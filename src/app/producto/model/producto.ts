@@ -5,4 +5,5 @@ export interface Producto {
   precio: number;
   categoria: String;
   imagen: string;
+  stock: number; // Agregado para manejar el stock
 }

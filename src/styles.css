@@ -56,3 +56,13 @@ button {
 button:hover {
   background-color: #254aa5;
 }
+
+.link-navegacion {
+  color: #1976d2; /* color azul */
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.link-navegacion:hover {
+  text-decoration: underline;
+}
