@@ -1,0 +1,181 @@
+<div class="flex flex-col items-center justify-center px-4 py-16 min-h-[calc(100vh-297px)] bg-gray-50 text-[#191919]"
+    [@fadeSlideIn]>
+
+    <!-- Snackbar de acción general -->
+    <div *ngIf="mensajeToast"
+        class="fixed top-7 right-4 z-50 px-3 py-2 rounded-md border shadow-[0_4px_12px_rgba(0,0,0,0.3)] flex items-center gap-2 transition-all duration-300"
+        [ngClass]="{
+    'bg-white text-gray-900 border-gray-200': tipoToast === 'info',
+    'bg-green-50 text-green-800 border-green-200': tipoToast === 'aumentado',
+    'bg-gray-100 text-gray-700 border-gray-300': tipoToast === 'reducida',
+    'bg-yellow-100 text-yellow-800 border-yellow-300': tipoToast === 'stock',
+    'bg-red-100 text-red-700 border-red-300': tipoToast === 'eliminado',
+    'bg-pink-100 text-pink-700 border-pink-300': tipoToast === 'vaciado',
+  }">
+        <i-lucide [name]="
+    tipoToast === 'stock' ? 'AlertTriangle' :
+    tipoToast === 'eliminado' ? 'x-circle' :
+    tipoToast === 'aumentado' ? 'check-circle' :
+    tipoToast === 'vaciado' ? 'trash2' :
+    tipoToast === 'reducida' ? 'minus' :
+    'check-circle'" class="w-4 h-4" [ngClass]="{
+      'text-yellow-700': tipoToast === 'stock',
+      'text-red-600': tipoToast === 'eliminado',
+      'text-green-700': tipoToast === 'aumentado',
+      'text-pink-700': tipoToast === 'vaciado',
+      'text-gray-600': tipoToast === 'reducida',
+      'text-gray-700': tipoToast === 'info'
+    }"></i-lucide>
+        <span class="text-sm font-medium">{{ mensajeToast }}</span>
+    </div>
+
+    <ng-container *ngIf="!pedidoConfirmado; else mensajeConfirmacion">
+        <!-- Encabezado -->
+        <div class="flex items-center justify-between w-full max-w-4xl mb-6">
+            <div class="flex items-center gap-2">
+                <i-lucide name="shopping-cart" class="w-6 h-6 text-[#191919]"></i-lucide>
+                <h2 class="text-xl font-bold tracking-wide">Carrito de compras</h2>
+            </div>
+            <button *ngIf="carrito.productos.length > 0"
+                class="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 transition active:scale-[0.98] cursor-pointer"
+                (click)="confirmarVaciado()">
+                <i-lucide name="trash2" class="w-4 h-4"></i-lucide>
+                Vaciar carrito
+            </button>
+        </div>
+
+        <!-- Carrito vacío -->
+        <div *ngIf="carrito.productos.length === 0" class="text-center py-12">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Carrito vacío</h3>
+            <p class="text-sm text-gray-500 mb-4">Agregá productos para comenzar tu compra.</p>
+            <button routerLink="/producto"
+                class="bg-[#191919] hover:bg-black text-white px-4 py-2 rounded-md text-sm transition active:scale-[0.98] cursor-pointer">
+                Descubrir productos
+            </button>
+        </div>
+
+        <!-- Tabla de productos -->
+        <div *ngIf="carrito.productos.length > 0"
+            class="w-full max-w-4xl bg-white border border-gray-300 rounded-md shadow-sm overflow-hidden">
+            <table class="w-full border-collapse">
+                <thead class="bg-gray-100 text-center text-sm text-gray-600">
+                    <tr>
+                        <th class="p-3 text-center">Imagen</th>
+                        <th class="p-3 text-center">Producto</th>
+                        <th class="p-3 text-center">Cantidad</th>
+                        <th class="p-3 text-center">Precio</th>
+                        <th class="p-3 text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of carrito.productos" class="border-t text-center align-middle">
+                        <td class="p-3">
+                            <!-- Mostramos la imagen del producto. Si no tiene imagen, usamos una imagen genérica de respaldo para evitar errores visuales -->
+                            <img [src]="item.producto.imagen || 'https://via.placeholder.com/60x60?text=Sin+imagen'"
+                                alt="{{ item.producto.nombre }}"
+                                class="w-16 h-16 object-cover rounded-md border border-gray-200 mx-auto" />
+                        </td>
+                        <td class="p-3 font-medium text-gray-800">{{ item.producto.nombre }}</td>
+                        <td class="p-3">
+                            <div class="flex items-center justify-center">
+                                <div
+                                    class="flex items-center gap-1 bg-white border border-gray-300 rounded-md px-2 py-1 shadow-sm">
+                                    <button [ngClass]="{
+                  'w-6 h-6 flex items-center justify-center rounded-full transition active:scale-[0.97]': true,
+                  'bg-[#191919] hover:bg-black text-white cursor-pointer': item.cantidad > 1,
+                  'bg-gray-200 text-gray-500 cursor-default': item.cantidad <= 1
+                }" [attr.aria-label]="'Disminuir cantidad'" [disabled]="item.cantidad <= 1"
+                                        (click)="item.cantidad > 1 && disminuirCantidad(item.producto.id)">
+                                        <i-lucide name="minus" class="w-3 h-3"></i-lucide>
+                                    </button>
+
+                                    <span class="text-base font-semibold text-[#191919] px-3 select-none">
+                                        {{ item.cantidad }}
+                                    </span>
+
+                                    <button
+                                        class="w-6 h-6 flex items-center justify-center bg-[#191919] hover:bg-black text-white rounded-full transition active:scale-[0.97] cursor-pointer"
+                                        (click)="aumentarCantidad(item.producto.id)" aria-label="Aumentar cantidad">
+                                        <i-lucide name="plus" class="w-3 h-3 text-white"></i-lucide>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-3 text-sm text-gray-700">{{ item.producto.precio | currency:'ARS' }}</td>
+                        <td class="p-3">
+                            <button
+                                class="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-full transition active:scale-[0.98] cursor-pointer"
+                                (click)="eliminarProducto(item.producto.id)" aria-label="Eliminar producto">
+                                <i-lucide name="trash2" class="w-4 h-4"></i-lucide>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totales -->
+        <div *ngIf="carrito.productos.length > 0" class="text-right mt-4 w-full max-w-4xl">
+            <p class="text-sm"><strong>Total ARS:</strong> {{ totalARS | currency:'ARS' }}</p>
+        </div>
+
+        <!-- Acción según estado de sesión -->
+        <div *ngIf="carrito.productos.length > 0" class="text-right mt-6 w-full max-w-4xl">
+            @if (estaLogueado) {
+            <button
+                class="px-4 py-2 bg-[#191919] hover:bg-black text-white rounded-md text-sm transition active:scale-[0.98] cursor-pointer"
+                (click)="confirmarPedido()">
+                Confirmar pedido
+            </button>
+            } @else {
+            <div class="flex flex-col items-end">
+                <p class="text-sm text-gray-600 mb-2">
+                    Para confirmar tu pedido necesitás iniciar sesión.
+                </p>
+                <button (click)="irALogin()"
+                    class="flex items-center gap-2 bg-[#191919] hover:bg-black text-white px-4 py-2 rounded-md text-sm transition active:scale-[0.98] cursor-pointer">
+                    <i-lucide name="user" class="w-4 h-4"></i-lucide>
+                    <span>Iniciar sesión</span>
+                </button>
+            </div>
+            }
+        </div>
+    </ng-container>
+
+
+    <ng-template #mensajeConfirmacion>
+        <div class="text-center bg-white border border-gray-300 rounded-md p-6 shadow-md max-w-xl w-full">
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <i-lucide name="check-circle" class="w-6 h-6 text-green-500"></i-lucide>
+                <h2 class="text-xl font-bold text-green-600">Pedido realizado con éxito</h2>
+            </div>
+
+            <p class="mb-2 text-sm text-gray-700">
+                Comunícate al <strong>WhatsApp</strong> para continuar con el pago por transferencia y recibir más
+                información sobre tu pedido.
+            </p>
+
+            <p class="mb-1 text-sm text-gray-700">
+                <strong>Total ARS:</strong> {{ totalARS | currency:'ARS' }}
+            </p>
+            <p class="text-xs text-gray-500 mb-6">
+                (equivalente a <strong>{{ totalUSD | currency:'USD':'symbol':'1.2-2' }}</strong>)
+            </p>
+
+            <!-- Botón para descargar factura PDF centrado -->
+            <button
+                class="mb-4 mx-auto flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-[#191919] px-4 py-2 rounded-md text-sm transition active:scale-[0.98] cursor-pointer"
+                (click)="descargarFactura()">
+                <i-lucide name="download" class="w-4 h-4"></i-lucide>
+                <span>Descargar factura PDF</span>
+            </button>
+
+            <button
+                class="px-4 py-2 bg-[#191919] hover:bg-black text-white rounded-md text-sm transition active:scale-[0.98] cursor-pointer"
+                routerLink="/home">
+                Volver al inicio
+            </button>
+        </div>
+    </ng-template>
+</div>

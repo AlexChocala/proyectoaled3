@@ -1,0 +1,13 @@
+ <h2 mat-dialog-title class="text-lg font-semibold">Agregar categoría</h2>
+    <form [formGroup]="formulario" (ngSubmit)="confirmar()" class="px-4 pb-4 space-y-4">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Nombre de categoría</mat-label>
+        <input matInput formControlName="nombre" >
+        <mat-error *ngIf="formulario.get('nombre')?.invalid">Campo requerido</mat-error>
+      </mat-form-field>
+
+      <div class="flex justify-end gap-2">
+        <button mat-button type="button" (click)="cerrar()">Cancelar</button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="formulario.invalid">Agregar</button>
+      </div>
+    </form>

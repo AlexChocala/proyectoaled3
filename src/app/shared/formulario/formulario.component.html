@@ -1,0 +1,74 @@
+<div [formGroup]="formulario">
+  @for (campo of camposFormulario; track campo.nombre) {
+  <div [@fadeInUp]>
+    <label class="block text-sm font-medium text-gray-700">
+      {{ capitalizarLabel(campo.nombre) }}
+    </label>
+    <div class="relative mt-1">
+      <!-- ICONO -->
+      <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[#191919]">
+        <i-lucide [name]="campo.icono" class="w-5 h-5"></i-lucide>
+      </span>
+      <!-- CAMPOS -->
+      @switch (campo.tipo) {
+      @case ('select') {
+      <mat-select #selectorCategoria [formControlName]="campo.nombre"
+        class="pl-10 pr-10 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black bg-white appearance-none cursor-pointer transition-all duration-300">
+        @for (opcion of campo.opciones; track opcion) {
+        <mat-option [value]="opcion">{{ opcion }}</mat-option>
+        }
+      </mat-select>
+      @if (campo.nombre === 'categoria') {
+      <div class="absolute top-2 right-2 flex items-center gap-2 cursor-pointer">
+        <!-- Icono flecha hacia abajo -->
+        <i-lucide name="chevron-down" class="w-4 h-4 text-gray-500 hover:text-black transition cursor-pointer"
+          (click)="selectorCategoria.open()"></i-lucide>
+
+        <!-- Botón agregar categoría -->
+        <button type="button" (click)="agregarCategoria()"
+          class="flex items-center justify-center w-6 h-6 bg-[#191919] hover:bg-black hover:shadow-md text-gray-50 rounded-full transition duration-200 active:scale-[0.98] cursor-pointer"
+          aria-label="Agregar categoría">
+          <i-lucide name="plus" class="w-4 h-4"></i-lucide>
+        </button>
+      </div>
+      }
+      }
+
+      @case ('radio') {
+      <mat-radio-group [formControlName]="campo.nombre" class="pl-10">
+        @for (opcion of campo.opciones; track opcion) {
+        <mat-radio-button [value]="opcion" class="mr-4">{{ opcion }}</mat-radio-button>
+        }
+      </mat-radio-group>
+      }
+
+      @case ('textarea') {
+      <textarea matInput [formControlName]="campo.nombre" [placeholder]="campo.placeholder ?? ''"
+        class="pl-10 pr-10 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black transition-all duration-300 resize-none"></textarea>
+      }
+
+      @default {
+      <input matInput [type]="campo.tieneToggle ? (hide() ? 'password' : 'text') : campo.tipo"
+        [formControlName]="campo.nombre" [placeholder]="campo.placeholder?? ''"
+        [attr.inputmode]="campo.tipo === 'number' ? 'decimal' : null"
+        class="pl-10 pr-10 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black transition-all duration-300">
+      @if (campo.tieneToggle) {
+      <button type="button" (click)="clickEvent($event)"
+        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-[#191919]"
+        [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide()">
+        <i-lucide [name]="hide() ? 'eye' : 'eye-off'" class="w-5 h-5 cursor-pointer"></i-lucide>
+      </button>
+      }
+      }
+      }
+    </div>
+
+    <!-- MENSAJE DE ERROR -->
+    <app-snackbar-validacion [control]="getControl(campo.nombre)" [campoNombre]="campo.nombre"
+      [camposValidacion]="camposValidacion">
+    </app-snackbar-validacion>
+  </div>
+  }@empty {
+  <p>NADA QUE CARGAR</p>
+  }
+</div>

@@ -1,0 +1,88 @@
+<!-- 🖼️ Carrousel de banners -->
+<div class="relative w-full overflow-hidden h-[500px]">
+    <div #carousel class="flex w-full transition-transform duration-700 ease-in-out">
+        <img src="https://acdn-us.mitiendanube.com/stores/219/431/themes/rio/2-slide-1758833466150-4676090892-c5f55246a8391cc5db82076449737d471758833469-1920-1920.webp?1748842256"
+            class="w-full h-[500px] object-cover flex-shrink-0" />
+        <img src="https://acdn-us.mitiendanube.com/stores/219/431/themes/rio/2-slide-1754694632460-7798906754-d8883c1860ea874e0e330a154b6173331754694635-1920-1920.webp?1748842256"
+            class="w-full h-[500px] object-cover flex-shrink-0" />
+        <img src="https://acdn-us.mitiendanube.com/stores/219/431/themes/rio/2-slide-1759435964552-5637364397-ee8cce21a412b91741882860172a75f31759435965-1920-1920.webp?1748842256"
+            class="w-full h-[500px] object-cover flex-shrink-0" />
+    </div>
+
+    <!-- Flecha izquierda -->
+    <button (click)="prevSlide()"
+        class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 rounded-full z-10 cursor-pointer">
+        <i-lucide name="chevron-left" class="w-5 h-5"></i-lucide>
+    </button>
+
+    <!-- Flecha derecha -->
+    <button (click)="nextSlide()"
+        class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 rounded-full z-10 cursor-pointer">
+        <i-lucide name="chevron-right" class="w-5 h-5"></i-lucide>
+    </button>
+</div>
+
+<!-- Productos recientes -->
+<section class="px-10 py-12 bg-gray-50" [@fadeSlideIn]>
+    <h2 class="text-xl font-bold text-black mb-6 text-center tracking-wide">Últimos productos agregados</h2>
+
+    <div class="relative max-w-6xl mx-auto">
+        <!-- Flecha izquierda -->
+        <button (click)="scrollSlider('izquierda')"
+            class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 rounded-full z-10 cursor-pointer">
+            <i-lucide name="chevron-left" class="w-5 h-5"></i-lucide>
+        </button>
+
+        <!-- Slider horizontal -->
+        <div #slider class="overflow-hidden">
+            <div class="flex gap-6 w-max px-2">
+                @for (prod of productosRecientes; track prod.id) {
+                <div class="producto-card w-[280px] relative overflow-hidden bg-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-lg flex flex-col h-[500px]"
+                    [@fadeSlideIn]>
+
+                    <!-- Imagen -->
+                    <div class="w-full h-[360px]">
+                        <img [src]="prod.imagen" alt="{{ prod.nombre }}" class="w-full h-full object-cover" />
+                    </div>
+
+                    <!-- Info -->
+                    <div class="flex flex-col items-center text-center px-4 pt-3 pb-0">
+                        <h3 class="text-sm font-semibold text-black leading-tight">{{ prod.nombre }}</h3>
+                        <p class="text-xs text-gray-600 leading-snug truncate max-w-[90%]">{{ prod.descripcion }}</p>
+                        <p class="text-sm font-bold text-black mt-1">$ {{ prod.precio }}</p>
+                    </div>
+
+                    <!-- Botón -->
+                    <div class="mt-2 mb-3 flex justify-center">
+                        <button
+                            class="flex items-center gap-2 bg-[#191919] hover:bg-black text-white px-4 py-2 rounded-md text-sm transition active:scale-[0.98] cursor-pointer">
+                            <i-lucide name="shopping-cart" class="w-4 h-4"></i-lucide>
+                            Agregar al carrito
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Flecha derecha -->
+        <button (click)="scrollSlider('derecha')"
+            class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 rounded-full z-10 cursor-pointer">
+            <i-lucide name="chevron-right" class="w-5 h-5"></i-lucide>
+        </button>
+
+        <!-- Subtítulo antes del botón -->
+        <p class="text-center text-sm text-gray-600 mt-12 mb-4">
+            ¿Querés explorar más estilos? Tenemos mucho más para vos.
+        </p>
+
+        <!-- Botón para ver más productos -->
+        <div class="flex justify-center">
+            <a [routerLink]="'/producto'"
+                class="flex items-center gap-2 bg-[#191919] text-gray-50 px-6 py-3 rounded-md text-sm font-medium tracking-wide hover:bg-black transition active:scale-[0.98]">
+                <i-lucide name="grid" class="w-4 h-4"></i-lucide>
+                Ver más productos
+            </a>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,63 @@
+<!-- Snackbar visual para productos -->
+<div *ngIf="mensajeToast"
+  class="fixed top-7 right-4 z-50 px-3 py-2 rounded-md border shadow-[0_4px_12px_rgba(0,0,0,0.3)] flex items-center gap-2 transition-all duration-300"
+  [ngClass]="{
+    'bg-green-50 text-green-800 border-green-200': tipoToast === 'agregado',
+    'bg-blue-50 text-blue-800 border-blue-200': tipoToast === 'modificado',
+    'bg-red-100 text-red-700 border-red-300': tipoToast === 'eliminado'
+  }">
+  <i-lucide [name]="
+    tipoToast === 'agregado' ? 'check-circle' :
+    tipoToast === 'modificado' ? 'edit' :
+    'x-circle'" class="w-4 h-4" [ngClass]="{
+      'text-green-700': tipoToast === 'agregado',
+      'text-blue-700': tipoToast === 'modificado',
+      'text-red-600': tipoToast === 'eliminado'
+    }"></i-lucide>
+  <span class="text-sm font-medium">{{ mensajeToast }}</span>
+</div>
+
+<!-- CONTENEDOR CENTRAL -->
+<div class="bg-gray-50 px-6 flex" style="height: calc(100vh - 100px);">
+  <div class="m-auto w-full max-w-[500px] bg-white rounded-xl shadow-xl overflow-hidden" [@fadeInUp]>
+
+    <!-- ENCABEZADO -->
+    <div class="bg-[#191919] text-white px-6 py-4 rounded-t-xl text-center">
+      <h2 class="text-2xl font-bold tracking-wide">
+        {{ esEdicion ? 'MODIFICAR PRODUCTO' : 'ALTA PRODUCTO' }}
+      </h2>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="p-6 space-y-6">
+      <form [formGroup]="formularioProducto" (ngSubmit)="registrar()" class="space-y-6">
+
+        <!-- CAMPOS DEL FORMULARIO -->
+        <app-campos-formulario [camposFormulario]="camposFormulario" [camposValidacion]="camposValidacion"
+          [formulario]="formularioProducto">
+        </app-campos-formulario>
+
+        <!-- BOTONES -->
+        <div class="flex flex-col gap-3">
+          <button type="submit" [disabled]="formularioProducto.invalid" [ngClass]="{
+            'bg-[#191919] hover:bg-black text-white': formularioProducto.valid,
+            'bg-[#5e5e5e] text-gray-300': formularioProducto.invalid
+          }" class="py-2 px-4 rounded-md transition duration-300 w-full cursor-pointer">
+            {{ esEdicion ? 'MODIFICAR' : 'AGREGAR' }}
+          </button>
+
+          <button type="button" (click)="cancelar()"
+            class="py-2 px-4 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition duration-300 w-full cursor-pointer">
+            Cancelar
+          </button>
+
+          <!-- Botón para eliminar producto (solo en edición) -->
+          <button *ngIf="esEdicion" type="button" (click)="eliminar()"
+            class="py-2 px-4 rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition duration-300 w-full cursor-pointer">
+            Eliminar producto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

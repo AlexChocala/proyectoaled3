@@ -1,0 +1,22 @@
+<!-- 📊 Gráficos de reportes -->
+<div class="grid grid-cols-1 gap-6">
+    <!-- 🟦 Ventas por día (fila completa arriba) -->
+    <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+        <h4 class="text-sm font-semibold mb-3">Ventas por día (simulado)</h4>
+        <canvas id="ventasChart" class="w-full" style="height: 200px;"></canvas>
+    </div>
+
+    <!-- 🟦 Evolución del dólar (fila completa debajo) -->
+    <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+        <h4 class="text-sm font-semibold mb-3">Evolución del dólar semanal</h4>
+        <canvas id="dolarChart" class="w-full" style="height: 200px;"></canvas>
+    </div>
+
+    <!-- 🟨 Productos más vendidos (centrado y compacto) -->
+    <div class="flex justify-center">
+        <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm w-full max-w-md">
+            <h4 class="text-sm font-semibold mb-3 text-center">Productos más vendidos</h4>
+            <canvas id="productosChart" class="w-full" style="height: 180px;"></canvas>
+        </div>
+    </div>
+</div>

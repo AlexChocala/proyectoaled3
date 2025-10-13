@@ -1,6 +1,15 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
+import { appConfig } from './app/app.config';
+import { LucideAngularModule } from 'lucide-angular';
+import { lucideIcons } from './app/shared/lucide-icons';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+const lucideProviders = LucideAngularModule.pick(lucideIcons).providers ?? [];
+
+bootstrapApplication(AppComponent, {
+  ...appConfig,
+  providers: [
+    ...(appConfig.providers ?? []),
+    ...lucideProviders
+  ]
+}).catch(err => console.error(err));

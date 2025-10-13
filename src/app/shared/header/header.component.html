@@ -1,0 +1,172 @@
+<header class="w-full bg-[#191919] text-white shadow-md" [@fadeSlideIn]>
+
+  <!-- Header para escritorio -->
+  <div class="hidden md:grid max-w-7xl mx-auto px-6 py-7 grid-cols-3 items-center">
+    <!-- IZQUIERDA: Logo -->
+    <div class="text-xl font-bold tracking-wide">
+      <a [routerLink]="'/home'" class="hover:text-gray-300 transition text-2xl">AFTER STREET</a>
+    </div>
+
+    <!-- CENTRO: Navegación centrada -->
+    <nav class="flex justify-center space-x-6 text-sm font-medium">
+      <!-- Enlace directo a PRODUCTOS sin menú desplegable -->
+      <a [routerLink]="'/producto'" class="hover:text-gray-300 transition uppercase">PRODUCTOS</a>
+
+      <!-- Resto de la navegación -->
+      <ng-container *ngFor="let item of navegacion">
+        <a *ngIf="mostrarItem(item.label)" [routerLink]="item.path" class="hover:text-gray-300 transition">
+          {{ item.label }}
+        </a>
+      </ng-container>
+    </nav>
+
+
+    <!-- DERECHA: Iconos -->
+    <div class="flex justify-end items-center space-x-4">
+      <a *ngIf="!logueado" [routerLink]="'/iniciar_sesion'" aria-label="Iniciar sesión"
+        class="hover:text-gray-300 transition">
+        <i-lucide name="user" class="w-5 h-5"></i-lucide>
+      </a>
+      <ng-template [ngIf]="logueado">
+        <div class="flex items-center space-x-4">
+          <a [routerLink]="'/chat'" aria-label="Chat"
+            class="relative flex items-center gap-1 hover:text-gray-300 transition">
+            <i-lucide name="message-circle" class="w-5 h-5"></i-lucide>
+            <span *ngIf="mensajesNuevos > 0"
+              class="absolute -top-1 -right-2 bg-red-600 text-white text-xs rounded-full px-2">
+              {{ mensajesNuevos }}
+            </span>
+          </a>
+          <i-lucide name="user" class="w-5 h-5"></i-lucide>
+          <span class="text-sm font-medium">{{ nombreUsuario }}</span>
+          <button (click)="cerrar_sesion()" aria-label="Cerrar sesión"
+            class="hover:text-gray-300 transition cursor-pointer">
+            <i-lucide name="log-out" class="w-5 h-5"></i-lucide>
+          </button>
+        </div>
+      </ng-template>
+      <a [routerLink]="'/carrito'" aria-label="Carrito"
+        class="relative flex items-center gap-1 hover:text-gray-300 transition">
+        <i-lucide name="shopping-bag" class="w-5 h-5"></i-lucide>
+        <span *ngIf="carrito.cantidadTotal > 0"
+          class="absolute -top-1 -right-2 bg-red-600 text-white text-xs rounded-full px-2">
+          {{ carrito.cantidadTotal }}
+        </span>
+      </a>
+    </div>
+  </div>
+
+
+
+  <!-- 📱 Header para móvil -->
+  <div class="relative flex md:hidden items-center h-[60px] px-6 py-5">
+    <!-- Hamburguesa -->
+    <div class="absolute left-6 top-1/2 -translate-y-1/2">
+      <button (click)="toggleMenuMovil()" aria-label="Abrir menú">
+        <i-lucide name="menu" class="w-6 h-6 text-white"></i-lucide>
+      </button>
+    </div>
+
+    <!-- Logo centrado absoluto -->
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+      <a [routerLink]="'/home'" class="text-xl font-bold tracking-wide text-white">
+        AFTER STREET
+      </a>
+    </div>
+
+    <!-- Iconos a la derecha -->
+    <div class="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-4">
+      <!-- Chat con contador (solo si está logueado) -->
+      <ng-container *ngIf="logueado">
+        <a [routerLink]="'/chat'" aria-label="Chat"
+          class="relative flex items-center gap-1 hover:text-gray-300 transition">
+          <i-lucide name="message-circle" class="w-5 h-5"></i-lucide>
+          <span *ngIf="mensajesNuevos > 0"
+            class="absolute -top-1 -right-2 bg-red-600 text-white text-xs rounded-full px-2">
+            {{ mensajesNuevos }}
+          </span>
+        </a>
+      </ng-container>
+
+      <!-- Usuario (solo si NO está logueado) -->
+      <ng-container *ngIf="!logueado">
+        <a [routerLink]="'/iniciar_sesion'" aria-label="Iniciar sesión" class="hover:text-gray-300 transition">
+          <i-lucide name="user" class="w-5 h-5"></i-lucide>
+        </a>
+      </ng-container>
+
+      <!-- Carrito con contador (siempre visible) -->
+      <a [routerLink]="'/carrito'" aria-label="Carrito"
+        class="relative flex items-center gap-1 hover:text-gray-300 transition">
+        <i-lucide name="shopping-bag" class="w-5 h-5"></i-lucide>
+        <span *ngIf="carrito.cantidadTotal > 0"
+          class="absolute -top-1 -right-2 bg-red-600 text-white text-xs rounded-full px-2">
+          {{ carrito.cantidadTotal }}
+        </span>
+      </a>
+    </div>
+  </div>
+
+
+  <!-- Menú móvil desplegable -->
+  <div *ngIf="menuMovilAbierto" @fadeSlideIn class="fixed inset-0 z-50">
+    <!-- Fondo oscuro con opacidad -->
+    <div class="absolute inset-0 bg-black bg-opacity-80 z-40" (click)="cerrarMenuMovil()"></div>
+
+    <!-- Panel lateral (por encima del fondo) -->
+    <div class="absolute inset-0 bg-[#191919] z-50 flex flex-col px-6 pt-6 pb-10 text-white">
+
+      <!-- Botón de cierre -->
+      <div class="flex justify-end mb-6">
+        <button (click)="cerrarMenuMovil()" aria-label="Cerrar panel"
+          class="bg-white/10 text-white hover:bg-white/20 transition w-10 h-10 flex items-center justify-center rounded-full">
+          <i-lucide name="x" class="w-6 h-6"></i-lucide>
+        </button>
+      </div>
+
+      <!-- Navegación principal -->
+      <div class="flex flex-col gap-4 text-sm font-medium uppercase tracking-wide">
+        <a [routerLink]="'/producto'" (click)="cerrarMenuMovil()" class="hover:text-gray-300">
+          PRODUCTOS
+        </a>
+        <a *ngIf="logueado" [routerLink]="'/chat'" (click)="cerrarMenuMovil()" class="hover:text-gray-300">
+          CHAT
+        </a>
+        <a *ngIf="logueado && mostrarItem('REPORTE')" [routerLink]="'/reporte'" (click)="cerrarMenuMovil()"
+          class="hover:text-gray-300">
+          REPORTES
+        </a>
+      </div>
+
+      <!-- Línea divisoria -->
+      <div class="border-t border-gray-700 my-6"></div>
+
+      <!-- Usuario y sesión -->
+      <div class="flex flex-col gap-4 text-sm">
+        <ng-container *ngIf="logueado; else loginLink">
+          <div class="flex items-center gap-2">
+            <i-lucide name="user" class="w-5 h-5"></i-lucide>
+            <span>{{ nombreUsuario }}</span>
+          </div>
+          <button (click)="cerrar_sesion()" class="flex items-center gap-2 hover:text-gray-300">
+            <i-lucide name="log-out" class="w-5 h-5"></i-lucide>
+            Cerrar sesión
+          </button>
+        </ng-container>
+
+        <!-- Iniciar sesión / Registrarse (solo si NO está logueado) -->
+        <ng-template #loginLink>
+          <a [routerLink]="'/iniciar_sesion'" (click)="cerrarMenuMovil()"
+            class="flex items-center gap-2 hover:text-gray-300">
+            <i-lucide name="log-in" class="w-5 h-5"></i-lucide>
+            Iniciar sesión
+          </a>
+          <a [routerLink]="'/registrarse'" (click)="cerrarMenuMovil()"
+            class="flex items-center gap-2 hover:text-gray-300">
+            <i-lucide name="user-plus" class="w-5 h-5"></i-lucide>
+            Registrarse
+          </a>
+        </ng-template>
+      </div>
+    </div>
+  </div>
