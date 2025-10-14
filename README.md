@@ -1,54 +1,58 @@
-# https://algoritmo3-8ee11.web.app/
+# 🛍️ After Street | Tienda Online de Ropa Urbana 🌟  
+🔗 Sitio web: https://algoritmo3-8ee11.web.app
 
-## invitado
-* acceso a: vista home y presentancion
-
-## USUARIO:
-* accesso a: carrito con factura de compra | chat entre usuarios y superusuario
-
-## SUPERUSUARIO (max 2)
-* acceso a:  carrito con factura de compra | reporte | ABM producto | chat entre usuarios y superusuario
-(registrese por favor)
-
-# 🌟 **POMELO** 🌟
-
-🚀 _Desarrollo de proyecto colaborativo para la facultad Beltran _
+🚀 Proyecto colaborativo desarrollado para la Facultad Beltrán, enfocado en moda urbana y experiencia de compra digital.
 
 ---
 
-# 👨‍💻 Autores 
+## 🔐 Acceso de prueba para rol Administrador
 
-* 👤  - [FRANCISCO LEONEL GALLARDO](https://github.com/Naranja-sys)
-* 👤 -  [ALEX CHOCALA](https://github.com/AlexChocala/)
-* 🧡 Agradecido con el de arriba
+📧 Email: alex@hotmail.com  
+🔑 Contraseña: Alex.123123123  
 
-## 📝 Características del proyecto POMELO
-
-* 🌐 Integración con API externa.
-* 🌍 Soporte multilingüe. 
-* 🎨 Interfaz visualmente atractiva para el usuario.
-
-## 📖 **Tabla de Contenidos**
-- [✨ Introducción](#-introducción)
-- [⚙️ Instalación](#-instalación)
-- [🛠️ Roadmap](#-roadmap)
-- [👨‍💻 Autores](#-autores)
-- [📄 Licencia](#-licencia)
+Este usuario tiene acceso completo al sistema, incluyendo el panel de administración y reportes.
 
 ---
 
-## ✨ **Introducción**
+## 👥 Roles y accesos
 
-💡 _Explicación sobre el propósito del proyecto, el contexto y el problema que soluciona._  
-**Ejemplo**: Objetivo de mejora y blah
+### 🧑‍🦰 Invitado
+* Acceso a: vista Home y presentación del sitio
+
+### 👤 Usuario
+* Acceso a: carrito con factura de compra  
+* Acceso a: chat entre usuarios y SuperUsuario
+
+### 🦸‍♂️ SuperUsuario (máximo 2)
+* Acceso a: carrito con factura de compra  
+* Acceso a: reporte de compras  
+* Acceso a: ABM de productos  
+* Acceso a: chat entre usuarios y SuperUsuario  
+_(Regístrese para acceder a este rol)_
 
 ---
 
-## ⚙️ **Instalación**
+## 👨‍💻 Autores
 
-** **
+* 👤 [Alex Chocala](https://github.com/AlexChocala)  
+* 👤 [Francisco Leonel Gallardo](https://github.com/Naranja-sys)  
 
-## 🚀 
+---
 
-## 📄 Licencia
-Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+## 🛒 Características del proyecto
+
+* 🧥 Catálogo de ropa urbana con imágenes y descripciones  
+* 🛍️ Carrito de compras funcional  
+* 🔐 Lógica de roles (Administrador, Usuario, SuperUsuario)  
+* 🌐 Integración con API externa  
+* 🌍 Soporte multilingüe  
+* 🎨 Interfaz moderna, responsiva y visualmente atractiva  
+* 📊 Panel de administración con reportes y métricas
+
+---
+
+## ✨ Introducción
+
+After Street es una tienda online de ropa urbana pensada para ofrecer una experiencia de compra intuitiva, rápida y visualmente atractiva.  
+El proyecto fue desarrollado como parte de un trabajo académico, con foco en diseño responsivo, integración de funcionalidades reales y lógica de roles para administración.
+
