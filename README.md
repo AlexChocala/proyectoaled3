@@ -45,14 +45,22 @@ _(Regístrese para acceder a este rol)_
 * 🛍️ Carrito de compras funcional  
 * 🔐 Lógica de roles (Administrador, Usuario, SuperUsuario)  
 * 🌐 Integración con API externa  
-* 🌍 Soporte multilingüe  
 * 🎨 Interfaz moderna, responsiva y visualmente atractiva  
 * 📊 Panel de administración con reportes y métricas
+
+---
+
+## 🧩 Correcciones pendientes
+
+* Integrar el componente `dolarcotizacion` para convertir precios de USD a ARS en las distintas vistas del sitio (por ejemplo, en la pestaña Home).  
+* Conectar con Firebase para finalizar el historial de pedidos y generar gráficos en la sección de reportes.  
+* Mejorar la accesibilidad en dispositivos móviles, ajustando colores, animaciones y comportamiento responsive.
 
 ---
 
 ## ✨ Introducción
 
 After Street es una tienda online de ropa urbana pensada para ofrecer una experiencia de compra intuitiva, rápida y visualmente atractiva.  
-El proyecto fue desarrollado como parte de un trabajo académico, con foco en diseño responsivo, integración de funcionalidades reales y lógica de roles para administración.
+El proyecto fue desarrollado como parte de un trabajo académico, con foco en diseño, integración de funcionalidades reales y lógica de roles para administración.
+
 
