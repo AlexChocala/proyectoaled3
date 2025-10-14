@@ -1,4 +1,14 @@
-sitio web https://algoritmo3-8ee11.web.app/
+# sitio web https://algoritmo3-8ee11.web.app/
+
+## invitado
+* acceso a: vista home y presentancion
+
+## USUARIO:
+* accesso a: carrito con factura de compra | chat entre usuarios y superusuario
+
+## SUPERUSUARIO (max 2)
+* acceso a:  carrito con factura de compra | reporte | ABM producto | chat entre usuarios y superusuario
+(registrese por favor)
 
 # 🌟 **POMELO** 🌟
 
