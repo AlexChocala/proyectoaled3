@@ -70,66 +70,47 @@ tipoToast: 'info' | 'stock' | 'eliminado' | 'aumentado' | 'vaciado' | 'reducida'
     private dolarApi: DolarApiService // NUEVO: para obtener cotización
   ) {}
 
-/**
- * Al iniciar el componente:
- * - Restaura el carrito desde localStorage
- * - Reconstruye correctamente los productos para evitar errores de stock
- * - Calcula el total en ARS
- * - Obtiene cotización oficial del dólar
- * - Suscribe al estado de sesión del usuario
- */
-ngOnInit(): void {
-  const guardado = localStorage.getItem('carrito');
-  if (guardado) {
-    const restaurados = JSON.parse(guardado);
-    this.carrito.productos.splice(0, this.carrito.productos.length);
+  /**
+   * Al iniciar el componente:
+   * - Restaura el carrito desde localStorage
+   * - Calcula el total en ARS
+   * - Obtiene cotización oficial del dólar
+   * - Suscribe al estado de sesión del usuario
+   */
+  ngOnInit(): void {
+    this.carrito.restaurarDesdeLocalStorage();
+    this.calcularTotales();
 
-    for (const item of restaurados) {
-      // Aseguramos que el producto tenga stock y precio como número
-      const producto = {
-        ...item.producto,
-        stock: Number(item.producto.stock),
-        precio: Number(item.producto.precio),
-      };
-      this.carrito.productos.push({ producto, cantidad: item.cantidad });
-    }
+    this.dolarApi.obtenerCotizacionOficial().subscribe(valor => {
+      this.cotizacion = valor;
+    });
+
+    this.authService.usuario$.subscribe(usuario => {
+      this.estaLogueado = !!usuario;
+      this.nombreUsuario = usuario?.displayName ?? '';
+    });
   }
 
-  this.calcularTotales();
+  /**
+   * Calcula el total en ARS según los productos del carrito
+   */
+  calcularTotales(): void {
+    this.totalARS = this.carrito.total;
+  }
 
-  this.dolarApi.obtenerCotizacionOficial().subscribe(valor => {
-    this.cotizacion = valor;
-  });
-
-  this.authService.usuario$.subscribe(usuario => {
-    this.estaLogueado = !!usuario;
-    this.nombreUsuario = usuario?.displayName ?? '';
-  });
-}
-
-/**
- * Calcula el total en ARS según los productos del carrito
- */
-calcularTotales(): void {
-  this.totalARS = this.carrito.total;
-}
-
-/**
- * Confirma el pedido actual:
- * - Guarda los productos seleccionados
- * - Calcula el total en USD
- * - Vacía el carrito
- * - Cambia el estado visual a "pedido confirmado"
- */
-confirmarPedido(): void {
-  // Esta línea convierte el total en pesos argentinos a dólares usando la cotización oficial
-  // Se usa para mostrar el equivalente en USD en la factura final
-  this.totalUSD = this.cotizacion > 0 ? +(this.totalARS / this.cotizacion).toFixed(2) : 0;
-
-  this.productosConfirmados = [...this.carrito.productos]; // Guardar productos antes de vaciar
-  this.pedidoConfirmado = true;
-  this.carrito.vaciar();
-}
+  /**
+   * Confirma el pedido actual:
+   * - Guarda los productos seleccionados
+   * - Calcula el total en USD
+   * - Vacía el carrito
+   * - Cambia el estado visual a "pedido confirmado"
+   */
+  confirmarPedido(): void {
+    this.totalUSD = this.cotizacion > 0 ? +(this.totalARS / this.cotizacion).toFixed(2) : 0;
+    this.productosConfirmados = [...this.carrito.productos]; // Guardar productos antes de vaciar
+    this.pedidoConfirmado = true;
+    this.carrito.vaciar();
+  }
 
   /**
    * Redirige al usuario a la pantalla de login

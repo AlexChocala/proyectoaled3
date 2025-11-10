@@ -63,15 +63,17 @@ export class HeaderComponent {
     private chatService: ChatService
   ) {
     this.authService.usuario$.subscribe(async usuario => {
-      this.logueado = !!usuario;
-      if (usuario) {
-        const base = usuario.displayName?.trim() || usuario.email?.split('@')[0] || 'Anónimo';
-        this.nombreUsuario = base.charAt(0).toUpperCase() + base.slice(1);
+    this.logueado = !!usuario;
+    if (usuario) {
+      const base = usuario.displayName?.trim() || usuario.email?.split('@')[0] || 'Anónimo';
+      this.nombreUsuario = base.charAt(0).toUpperCase() + base.slice(1);
 
-        // Verificar si es superUsuario
-        this.esSuperUsuario = await this.authService.esSuperUsuario();
-      }
-    });
+      this.esSuperUsuario = await this.authService.esSuperUsuario();
+    } else {
+      this.nombreUsuario = '';
+      this.esSuperUsuario = false;
+    }
+  });
 
     this.chatService.mensajesNuevos$.subscribe(count => {
       this.mensajesNuevos = count;

@@ -54,7 +54,7 @@ export class ChatComponent {
 
       this.chatService.escucharMensajes(msgs => {
         this.mensajes = msgs;
-        this.chatService.reiniciarContador(); // ✅ reinicia después de recibir
+        this.chatService.reiniciarContador(); // reinicia después de recibir
 
         this.mensajes.forEach((msg, index) => {
           console.log(`Mensaje ${index + 1}:`);

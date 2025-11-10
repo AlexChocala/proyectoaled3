@@ -145,7 +145,7 @@ export class AuthService {
     return this.auth.currentUser?.uid ?? null;
   }
 
-  // ✅ NUEVO: obtener el email del usuario actual
+  // NUEVO: obtener el email del usuario actual
   get emailActual(): string {
     return this.usuarioActual.value?.email ?? '';
   }
