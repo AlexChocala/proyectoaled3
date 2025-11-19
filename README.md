@@ -50,15 +50,6 @@ _(Regístrese para acceder a este rol)_
 
 ---
 
-## 🧩 Correcciones pendientes
-
-* Integrar el componente `dolarcotizacion` para convertir precios de USD a ARS en las distintas vistas del sitio (por ejemplo, en la pestaña Home).  
-* Conectar con Firebase para finalizar el historial de pedidos y generar gráficos en la sección de reportes.
-* Descuento de stock al realizar la compra.  
-* Mejorar la accesibilidad en dispositivos móviles, ajustando colores, animaciones y comportamiento responsive.
-
----
-
 ## ✨ Introducción
 
 After Street es una tienda online de ropa urbana pensada para ofrecer una experiencia de compra intuitiva, rápida y visualmente atractiva.  
