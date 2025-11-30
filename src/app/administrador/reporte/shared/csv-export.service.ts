@@ -6,24 +6,57 @@ import { Injectable } from '@angular/core';
  */
 @Injectable({ providedIn: 'root' })
 export class CsvExportService {
+
   exportar(pedidos: any[]): void {
-    const encabezado = ['Fecha', 'Cliente', 'Email', 'Productos', 'Total ARS', 'Total USD'];
-    const filas = pedidos.map(p => {
-      const productos = p.productos.map((prod: any) => `${prod.nombre} x${prod.cantidad}`).join(', ');
-      return [p.fecha, p.cliente, p.email, productos, p.totalARS, p.totalUSD];
+    const encabezados = ['Fecha', 'Cliente', 'Email', 'Producto', 'PrecioUnitarioARS', 'Cantidad', 'SubtotalARS', 'TotalARS', 'TotalUSD'];
+    const filas: string[][] = [];
+
+    pedidos.forEach(p => {
+      if (p.productos && p.productos.length > 0) {
+        p.productos.forEach((prod: any) => {
+          filas.push([
+            p.fecha,
+            p.cliente,
+            p.email,
+            prod.nombre,
+            String(prod.precioUnitario),
+            String(prod.cantidad),
+            String(prod.subtotal),
+            String(p.totalARS),
+            String(p.totalUSD)
+          ]);
+        });
+      } else {
+        filas.push([
+          p.fecha,
+          p.cliente,
+          p.email,
+          '',
+          '0',
+          '0',
+          '0',
+          String(p.totalARS),
+          String(p.totalUSD)
+        ]);
+      }
     });
 
-    const contenido = [encabezado, ...filas]
-      .map(fila => fila.map(campo => `"${campo}"`).join(','))
-      .join('\n');
+    const csvContent = [
+      encabezados.join(','),
+      ...filas.map(f => f.map(escapeCsv).join(','))
+    ].join('\n');
 
-    const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'reportes_ventas.csv';
+    link.download = 'facturas.csv';
     link.click();
     URL.revokeObjectURL(url);
+
+    function escapeCsv(value: any): string {
+      const s = String(value ?? '');
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }
   }
 }

@@ -9,6 +9,22 @@ import { AuthService } from '../../../usuario/services/auth.service';
 import { DolarApiService } from '../../../producto/services/dolar-api.service'; // NUEVO: para obtener cotización
 import jsPDF from 'jspdf'; // NUEVO: para generar PDF
 import { ItemCarrito } from '../../models/item-carrito.model'; // necesario para tipar productosConfirmados
+import { FirestoreService } from '../../../services/firestore.service';
+import { Producto } from '../../../producto/model/producto';
+
+export interface Facturas {
+  id?: string;
+  fecha: Date;
+  email: string;
+  productos: ItemCarrito[];
+  total: number;
+}
+
+export interface Ventas {
+  id?: string;
+  idProducto: string;
+  totalVendido: number;
+}
 
 @Component({
   selector: 'app-carrito',
@@ -51,8 +67,8 @@ export class CarritoComponent implements OnInit {
   // Mensaje visual tipo toast (éxito, info, etc.)
   mensajeToast: string | null = null;
 
- // Tipo de toast para definir color e ícono
-tipoToast: 'info' | 'stock' | 'eliminado' | 'aumentado' | 'vaciado' | 'reducida' = 'info';
+  // Tipo de toast para definir color e ícono
+  tipoToast: 'info' | 'stock' | 'eliminado' | 'aumentado' | 'vaciado' | 'reducida' = 'info';
 
   // Estado de sesión del usuario
   estaLogueado: boolean = false;
@@ -62,13 +78,16 @@ tipoToast: 'info' | 'stock' | 'eliminado' | 'aumentado' | 'vaciado' | 'reducida'
 
   // Lista de productos confirmados para la factura
   productosConfirmados: ItemCarrito[] = [];
+  private productosService = new FirestoreService<Producto>('Productos');
+  private facturasService = new FirestoreService<Facturas>('Facturas');
+  private ventasAcumuladasService = new FirestoreService<Ventas>('Ventas');
 
   constructor(
     public carrito: CarritoService,
     private authService: AuthService,
     private router: Router,
     private dolarApi: DolarApiService // NUEVO: para obtener cotización
-  ) {}
+  ) { }
 
   /**
    * Al iniciar el componente:
@@ -105,7 +124,8 @@ tipoToast: 'info' | 'stock' | 'eliminado' | 'aumentado' | 'vaciado' | 'reducida'
    * - Vacía el carrito
    * - Cambia el estado visual a "pedido confirmado"
    */
-  confirmarPedido(): void {
+  async confirmarPedido(): Promise<void> {
+    this.procesarFactura();
     this.totalUSD = this.cotizacion > 0 ? +(this.totalARS / this.cotizacion).toFixed(2) : 0;
     this.productosConfirmados = [...this.carrito.productos]; // Guardar productos antes de vaciar
     this.pedidoConfirmado = true;
@@ -124,13 +144,13 @@ tipoToast: 'info' | 'stock' | 'eliminado' | 'aumentado' | 'vaciado' | 'reducida'
  * @param mensaje Texto a mostrar
  * @param tipo Tipo de mensaje para definir color e ícono
  */
-mostrarToast(mensaje: string, tipo: typeof this.tipoToast = 'info'): void {
-  this.mensajeToast = mensaje;
-  this.tipoToast = tipo;
-  setTimeout(() => {
-    this.mensajeToast = null;
-  }, 3000);
-}
+  mostrarToast(mensaje: string, tipo: typeof this.tipoToast = 'info'): void {
+    this.mensajeToast = mensaje;
+    this.tipoToast = tipo;
+    setTimeout(() => {
+      this.mensajeToast = null;
+    }, 3000);
+  }
 
   /**
    * Elimina un producto del carrito por su ID
@@ -144,7 +164,7 @@ mostrarToast(mensaje: string, tipo: typeof this.tipoToast = 'info'): void {
     }
   }
 
-  
+
 
   /**
    * Aumenta la cantidad de un producto en el carrito
@@ -164,17 +184,17 @@ mostrarToast(mensaje: string, tipo: typeof this.tipoToast = 'info'): void {
  * Disminuye la cantidad de un producto en el carrito
  * @param id ID del producto
  */
-disminuirCantidad(id: string): void {
-  const producto = this.carrito.productos.find(p => p.producto.id === id);
-  if (!producto || producto.cantidad <= 1) return;
+  disminuirCantidad(id: string): void {
+    const producto = this.carrito.productos.find(p => p.producto.id === id);
+    if (!producto || producto.cantidad <= 1) return;
 
-  const resultado = this.carrito.disminuirPorId(id);
-  if (resultado === 'ok') {
-  } else {
-    this.mensajeStock = resultado;
+    const resultado = this.carrito.disminuirPorId(id);
+    if (resultado === 'ok') {
+    } else {
+      this.mensajeStock = resultado;
+    }
+    this.calcularTotales();
   }
-  this.calcularTotales();
-}
 
   /**
    * Confirma si se desea vaciar el carrito
@@ -205,7 +225,7 @@ disminuirCantidad(id: string): void {
     const ahora = new Date();
     const fecha = ahora.toLocaleDateString();
     const hora = ahora.toLocaleTimeString().replace(/:/g, '');
-    const pedidoId = `#AFS-${ahora.getFullYear()}${(ahora.getMonth()+1).toString().padStart(2,'0')}${ahora.getDate().toString().padStart(2,'0')}-${hora}`;
+    const pedidoId = `#AFS-${ahora.getFullYear()}${(ahora.getMonth() + 1).toString().padStart(2, '0')}${ahora.getDate().toString().padStart(2, '0')}-${hora}`;
 
     // Encabezado
     doc.setFontSize(18);
@@ -248,11 +268,118 @@ disminuirCantidad(id: string): void {
       doc.text(`${cantidad}`, 80, y);
       doc.text(`${precioARS.toFixed(2)}`, 110, y);
       doc.text(`${precioUSD.toFixed(2)}`, 140, y);
-    doc.text(`${subtotalARS.toFixed(2)}`, 170, y);
-    y += 8;
-  });
+      doc.text(`${subtotalARS.toFixed(2)}`, 170, y);
+      y += 8;
+    });
 
-  doc.save('AfterStreet_Factura.pdf');
-}
+    doc.save('AfterStreet_Factura.pdf');
+  }
+
+
+  async procesarFactura(): Promise<boolean> {
+    const email = this.authService.emailActual;
+
+    console.log("HOLA");
+    if (!email) {
+      this.mostrarToast('Debes iniciar sesión para confirmar el pedido.');
+      return false;
+    }
+
+    const productos = this.carrito.productos; // ItemCarrito[]
+
+    // 🔹 Convertir ItemCarrito[] a objetos planos
+    const productosPlano = this.carrito.productos.map(item => ({
+      cantidad: item.cantidad,
+      producto: {
+        id: item.producto.id,
+        nombre: item.producto.nombre,
+        categoria: item.producto.categoria,
+        descripcion: item.producto.descripcion,
+        imagen: item.producto.imagen,
+        precio: item.producto.precio,
+        stock: item.producto.stock
+      }
+    }));
+
+    const total = this.totalARS;
+    const fecha = new Date();
+
+    const factura: Facturas = {
+      email,
+      fecha,
+      productos: productosPlano,
+      total
+    };
+    console.log("HOLA1");
+    localStorage.getItem('carrito')
+
+    await this.facturasService.agregar(factura);
+
+    try {
+      console.log("HOLA2");
+      console.log("NOMO ", this.carrito.productos);
+      console.log("Cantidad de productos:", this.carrito);
+      // for (let item of this.carrito.productos) {
+      for (let item of productosPlano) {
+        console.log("HOLA3");
+
+        const idProducto = item.producto.id;
+        const cantidadVendida = item.cantidad;
+        console.log("HOLA4");
+
+        await this.actualizarStockProducto(idProducto, cantidadVendida);
+        console.log("el id del producto es ", idProducto);
+        console.log("cantidad vendida es ", cantidadVendida);
+        await this.actualizarAcumuladoVenta(idProducto, cantidadVendida);
+      }
+
+      // 3. Confirmación visual
+      this.mostrarToast('Pedido confirmado, ventas registradas y stock actualizado.');
+      return true;
+    } catch (error) {
+      console.error('Error al procesar la factura:', error);
+      this.mostrarToast('Ocurrió un error al procesar los datos.');
+      return false;
+    }
+  }
+
+  private async actualizarAcumuladoVenta(idProducto: string, cantidadVendida: number): Promise<void> {
+    const ventasDeProducto = await this.ventasAcumuladasService.buscarPorCampo('idProducto', idProducto);
+    if (!ventasDeProducto) { console.log("no encontrado"); }
+    let acumulado: Ventas = ventasDeProducto[0];
+
+    if (acumulado && acumulado.id) {
+      // const auxacu = acumulado.totalVendido + cantidadVendida;
+      // acumulado.totalVendido += auxacu;
+      acumulado.totalVendido += cantidadVendida;
+      console.log("VENTA ID ES ", acumulado.id);
+      await this.ventasAcumuladasService.modificar(acumulado);
+    } else {
+       console.log("No había acumulado previo, creando nuevo registro");
+      const nuevo: Ventas = {
+        id: idProducto,
+        idProducto,
+        totalVendido: cantidadVendida
+      };
+      await this.ventasAcumuladasService.guardarConId(idProducto, nuevo);
+    }
+  }
+  private async actualizarStockProducto(idProducto: string, cantidadVendida: number): Promise<void> {
+    console.log("ACTUALIZAR STOCK PRODUCTO");
+    console.log('ENTRANDO...', idProducto, cantidadVendida);
+    const productoFirestore = await this.productosService.obtenerPorId(idProducto);
+    if (!productoFirestore) {
+      console.warn(`No se encontró el producto con ID: ${idProducto}`);
+      return;
+    }
+    const prod: Producto = productoFirestore;
+    const nuevoStock = Number(prod.stock) - cantidadVendida;
+    if (nuevoStock < 0) {
+      console.warn(`Stock negativo para el producto ${productoFirestore.nombre}`);
+      return;
+    }
+    prod.stock = nuevoStock;
+    await this.productosService.modificar(prod);
+  }
 
 }

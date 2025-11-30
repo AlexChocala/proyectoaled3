@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, Input } from '@angular/core';
+import { Component, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart } from 'chart.js/auto';
 
@@ -8,69 +8,78 @@ import { Chart } from 'chart.js/auto';
   imports: [CommonModule],
   templateUrl: './ventas-chart.component.html'
 })
-export class VentasChartComponent implements AfterViewInit {
-  // 🧩 Recibe evolución semanal del dólar desde el componente padre
-  @Input() evolucionSemanal: number[] = [];
+export class VentasChartComponent implements OnChanges {
 
-  /**
-   * Al renderizar el componente, se generan los tres gráficos con datos simulados.
-   * El gráfico de dólar usa los datos reales pasados por @Input().
-   */
-  ngAfterViewInit(): void {
-    // 📊 Ventas por día
-    new Chart('ventasChart', {
+  @Input() evolucionSemanal: number[] = [];
+  @Input() ventasPorDia: number[] = [];
+  @Input() productosMasVendidos: any[] = [];
+
+  private ventasChart?: Chart;
+  private productosChart?: Chart;
+  private dolarChart?: Chart;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['ventasPorDia']) {
+      this.renderVentasChart();
+    }
+    if (changes['productosMasVendidos']) {
+      this.renderProductosChart();
+    }
+    if (changes['evolucionSemanal']) {
+      this.renderDolarChart();
+    }
+  }
+
+  private renderVentasChart() {
+    if (this.ventasChart) this.ventasChart.destroy();
+    this.ventasChart = new Chart('ventasChart', {
       type: 'bar',
       data: {
-        labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+        labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
         datasets: [{
           label: 'Cantidad de ventas',
-          data: [12, 19, 3, 5, 8],
-          backgroundColor: ['#A5D8FF', '#C3FBD8', '#FFD6E8', '#FFF3B0', '#D0C4FF'],
+          data: this.ventasPorDia.length > 0 ? this.ventasPorDia : [12, 19, 3, 5, 8, 7, 4],
+          backgroundColor: ['#A5D8FF', '#C3FBD8', '#FFD6E8', '#FFF3B0', '#D0C4FF', '#FFDAC1', '#E2F0CB'],
           borderRadius: 6
         }]
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { stepSize: 5 }
-          }
-        }
-      }
+      options: { responsive: true, plugins: { legend: { display: false } } }
     });
+  }
 
-    // 🛍️ Productos más vendidos
-    new Chart('productosChart', {
+  private renderProductosChart() {
+    console.log("DESDE EL HIJO", this.productosMasVendidos);
+    const labels = this.productosMasVendidos.map(p => p.nombre);
+    const data = this.productosMasVendidos.map(p => p.total);
+
+    if (this.productosChart) this.productosChart.destroy();
+    this.productosChart = new Chart('productosChart', {
       type: 'doughnut',
       data: {
-        labels: ['Remera Essentials', 'Jordan Retro', 'Buzo Fire', 'Samba Adidas'],
+        labels,
+        // labels: this.productosMasVendidos.map(p => p.nombre),
         datasets: [{
           label: 'Productos más vendidos',
-          data: [25, 18, 12, 30],
-          backgroundColor: ['#FFB3BA', '#BAE1FF', '#BFFCC6', '#FFFFBA'],
+          // data: this.productosMasVendidos.map(p => p.total),
+          data,
+          backgroundColor: ['#FFB3BA', '#BAE1FF', '#BFFCC6', '#FFFFBA', '#FFDAC1', '#E2F0CB', '#C4FAF8'],
           borderWidth: 1
         }]
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: 'bottom' }
-        }
-      }
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
     });
+  }
 
-    // 💱 Evolución del dólar (usa datos reales si están disponibles)
-    new Chart('dolarChart', {
+
+  private renderDolarChart() {
+    if (this.dolarChart) this.dolarChart.destroy();
+    this.dolarChart = new Chart('dolarChart', {
       type: 'line',
       data: {
-        labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+        labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
         datasets: [{
           label: 'Cotización del dólar',
-          data: this.evolucionSemanal.length > 0 ? this.evolucionSemanal : [850, 852, 849, 855, 860],
+          data: this.evolucionSemanal.length > 0 ? this.evolucionSemanal : [850, 852, 849, 855, 860, 862, 858],
           borderColor: '#4F46E5',
           backgroundColor: 'rgba(79,70,229,0.1)',
           tension: 0.3,
@@ -78,17 +87,7 @@ export class VentasChartComponent implements AfterViewInit {
           pointRadius: 4
         }]
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: true }
-        },
-        scales: {
-          y: {
-            beginAtZero: false
-          }
-        }
-      }
+      options: { responsive: true, plugins: { legend: { display: true } } }
     });
   }
 }

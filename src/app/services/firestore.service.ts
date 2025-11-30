@@ -1,7 +1,7 @@
 // import { Injectable } from '@angular/core';
 import { inject } from '@angular/core';
 import { FirebaseApp } from '@angular/fire/app';
-import { Firestore, getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
+import { Firestore, getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, onSnapshot, setDoc, getDoc, where } from 'firebase/firestore';
 
 export class FirestoreService<T extends { id?: string }> {
   private app = inject(FirebaseApp);
@@ -110,6 +110,26 @@ export class FirestoreService<T extends { id?: string }> {
       this.datos = nuevosDatos;
       callback(nuevosDatos);
     });
+  }
+
+  async buscarPorCampo(campo: keyof T, valor: any): Promise<T[]> {
+    try {
+      const q = query(collection(this.db, this.tabla), where(campo as string, '==', valor));
+      const querySnapshot = await getDocs(q);
+
+      const resultados: T[] = [];
+      querySnapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        if (data) {
+          resultados.push({ id: docSnap.id, ...(data as T) });
+        }
+      });
+
+      return resultados;
+    } catch (e) {
+      console.error(`Error al buscar por campo "${String(campo)}" en ${this.tabla}:`, e);
+      return [];
+    }
   }
 
 }

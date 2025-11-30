@@ -26,7 +26,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @for (pedido of pedidosMock; track pedido.idPedido) {
+                        @for (pedido of pedidos; track pedido.idPedido) {
                         <tr class="border-t hover:bg-gray-50 transition">
                             <td class="px-5 py-4 font-medium text-black">{{ pedido.cliente }}</td>
                             <td class="px-5 py-4 text-gray-600 text-xs">{{ pedido.email }}</td>
@@ -68,11 +68,9 @@
 
             <!-- Gráficos renderizados desde componente -->
             <div class="bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm">
-                <app-ventas-chart [evolucionSemanal]="evolucionSemanal"></app-ventas-chart>
+                <app-ventas-chart [evolucionSemanal]="evolucionSemanal" [ventasPorDia]="ventasPorDia" [productosMasVendidos]="productosMasVendidos"></app-ventas-chart>
             </div>
 
-            <p class="mt-6 text-xs text-gray-500 text-center">Todos los datos son simulados. Se conectarán a Firestore
-                en producción.</p>
         </section>
 
     </div>

@@ -8,12 +8,12 @@ import { LucideAngularModule } from 'lucide-angular';
 import { trigger, style, transition, animate } from '@angular/animations';
 import { FirestoreService } from '../../services/firestore.service';
 import { RouterModule } from '@angular/router';
-
+import { CotizacionDolarComponent } from '../../producto/shared/cotizacion-dolar/cotizacion-dolar.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, MatSnackBarModule, LucideAngularModule, RouterModule],
+  imports: [CotizacionDolarComponent,CommonModule, MatSnackBarModule, LucideAngularModule, RouterModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   animations: [
@@ -31,6 +31,7 @@ export class HomeComponent {
   // elementos html
 
   productosRecientes: Producto[] = [];
+  precioConvertidoPorId = new Map<string, number>();
 
   @ViewChild('slider', { static: false }) sliderRef!: ElementRef<HTMLDivElement>;
   @ViewChild('carousel', { static: false }) carouselRef!: ElementRef<HTMLDivElement>;
