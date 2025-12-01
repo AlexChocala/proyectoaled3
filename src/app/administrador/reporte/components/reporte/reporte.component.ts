@@ -227,6 +227,46 @@ this.pedidos.sort((a, b) => {
    * (Tu compañero puede implementar la lógica real)
    */
   exportarCSV(): void {
-    this.csvExportService.exportar(this.pedidos);
-  }
+  const encabezado = [
+    'Fecha',
+    'Cliente',
+    'Email',
+    'Producto',
+    'PrecioUnitarioARS',
+    'Cantidad',
+    'SubtotalARS',
+    'TotalARS',
+    'TotalUSD'
+  ];
+
+  const filas: string[] = [];
+
+  this.pedidos.forEach(pedido => {
+    (pedido.productos || []).forEach((p: { producto: any; cantidad: number }) => {
+      const producto = p.producto ?? {};
+      const fila = [
+        pedido.fecha,
+        pedido.cliente,
+        pedido.email,
+        producto.nombre ?? '',
+        producto.precioUnitario?.toFixed(2) ?? '',
+        p.cantidad ?? '',
+        producto.subtotal?.toFixed(2) ?? '',
+        pedido.totalARS,
+        pedido.totalUSD
+      ].join(',');
+      filas.push(fila);
+    });
+  });
+
+  const contenido = [encabezado.join(','), ...filas].join('\n');
+  const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'AfterStreet_Facturas.csv');
+  link.click();
+}
+
 }
