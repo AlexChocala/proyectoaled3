@@ -1,4 +1,6 @@
-<div class="flex flex-col items-center justify-center px-4 min-h-[calc(100vh-297px)]" [@fadeSlideIn]>
+<div class="bg-gray-50 flex flex-col items-center justify-center px-4 py-10 sm:py-12 min-h-[calc(100vh-297px)]"
+  [@fadeSlideIn]>
+
 
   <!-- Mostrar mensaje si NO está logueado -->
   @if (!estaLogueado) {
@@ -23,31 +25,31 @@
     <h2 class="text-xl font-bold text-[#191919] tracking-wide">Chat en tiempo real</h2>
   </div>
 
-  <!-- Chat -->
-  <div class="border border-gray-300 rounded-md p-4 h-[300px] overflow-y-auto bg-white space-y-2 w-full max-w-2xl">
-    @for (msg of mensajes; track msg.text) {
-    <div class="flex items-center gap-2 w-fit max-w-full bg-[#f4f4f4] px-4 py-2 rounded-md text-sm text-gray-800">
-      <!-- <span class="font-semibold text-[#191919] capitalize">{{ msg.nombre }}:</span> -->
-      <span class="font-semibold text-[#191919] capitalize">{{ msg.email }}:</span>
-      <span class="font-semibold text-[#191919] capitalize">{{ msg.rol }}:</span>
-      <span class="text-gray-700">{{ msg.text }}</span>
+  <!-- Contenedor del chat + input -->
+  <div class="w-full max-w-2xl px-4 sm:px-6 lg:px-8 mx-auto">
+    <!-- Chat -->
+    <div class="border border-gray-300 rounded-md p-4 h-[300px] overflow-y-auto bg-white space-y-2 w-full">
+      @for (msg of mensajes; track msg.text) {
+      <div
+        class="flex flex-wrap items-center gap-2 w-full bg-[#f4f4f4] px-4 py-2 rounded-md text-sm text-gray-800 break-words">
+        <span class="font-semibold text-[#191919] capitalize">{{ msg.email }}:</span>
+        <span class="font-semibold text-[#191919] capitalize">{{ msg.rol }}:</span>
+        <span class="text-gray-700">{{ msg.text }}</span>
+      </div>
+      }
     </div>
-    }
 
-    @empty {
-    <p class="text-sm text-gray-500">Todavía no hay mensajes.</p>
-    }
+    <!-- Escribir mensaje -->
+    <div class="mt-4 flex flex-col sm:flex-row gap-2 w-full">
+      <input [(ngModel)]="nuevoMensaje" (keydown.enter)="enviarMensaje()" type="text"
+        placeholder="Escribí tu mensaje..."
+        class="flex-1 border border-gray-300 rounded-md px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black">
+      <button (click)="enviarMensaje()"
+        class="bg-[#191919] hover:bg-black text-white px-5 py-3 rounded-md text-sm font-medium transition active:scale-[0.98] cursor-pointer">
+        Enviar
+      </button>
+    </div>
   </div>
 
-  <!-- Escribir mensaje -->
-  <div class="mt-4 flex gap-2 w-full max-w-2xl">
-    <!-- Enviar al presionar Enter -->
-    <input [(ngModel)]="nuevoMensaje" (keydown.enter)="enviarMensaje()" type="text" placeholder="Escribí tu mensaje..."
-      class="flex-1 border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black">
-    <button (click)="enviarMensaje()"
-      class="bg-[#191919] hover:bg-black text-white px-4 py-2 rounded-md text-sm transition active:scale-[0.98] cursor-pointer">
-      Enviar
-    </button>
-  </div>
   }
 </div>

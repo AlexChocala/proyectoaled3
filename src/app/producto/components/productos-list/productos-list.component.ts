@@ -9,7 +9,7 @@ import { ProductoFiltrarPipe } from '../../pipe/producto-filtrar.pipe';
 import { ProductosFormComponent } from '../productos-form/productos-form.component';
 import { Producto } from '../../model/producto';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../usuario/services/auth.service';
 import { LucideAngularModule } from 'lucide-angular';
 import { trigger, style, transition, animate } from '@angular/animations';
@@ -18,6 +18,8 @@ import { MatdialogComponent } from '../../../shared/matdialog/matdialog.componen
 import { CarritoService } from '../../../carrito/services/carrito.service';
 import { CommonModule } from '@angular/common';
 import { CotizacionDolarComponent } from '../../shared/cotizacion-dolar/cotizacion-dolar.component';
+import { NotificacionesToastService } from '../../../notificaciones/service/notificaciones-toast.service';
+
 
 export const columna = [
   { key: 'nombre', label: 'NOMBRE', icon: 'label' },
@@ -67,8 +69,9 @@ export class ProductosListComponent {
   private authService: AuthService = inject(AuthService);
   private productoService = new FirestoreService<Producto>('Productos');
   private dialog: MatDialog = inject(MatDialog);
-  private snackBar: MatSnackBar = inject(MatSnackBar);
   private carrito = inject(CarritoService);
+  private toast = inject(NotificacionesToastService);
+
 
   // Columnas visibles en la tabla
   public columnas = columna;
@@ -81,21 +84,13 @@ export class ProductosListComponent {
   esEdicion: boolean = false;
   logueado: boolean = false;
   esSuperusuario: boolean = false;
+  mostrarFiltrosMovil = false;
+
 
   categoriasDisponibles!: { nombre: string; cantidad: number }[];
   categoriaSeleccionada: string | null = null;
 
   precioConvertidoPorId = new Map<string, number>();
-
-  /**
-   * Mensaje visual tipo toast (éxito, info, etc.)
-   */
-  mensajeToast: string | null = null;
-
-  /**
-   * Tipo de toast para definir color e ícono
-   */
-  tipoToast: 'agregado' | 'modificado' | 'eliminado' = 'agregado';
 
   /**
    * Método del ciclo de vida que se ejecuta al inicializar el componente.
@@ -156,14 +151,23 @@ export class ProductosListComponent {
    * @param producto - El producto que se desea eliminar.
    */
   async eliminar(producto: Producto) {
-    this.dialog.open(MatdialogComponent).afterClosed().subscribe(async confirmacion => {
+    if (!this.esSuperusuario) return; // seguridad extra
+    this.dialog.open(MatdialogComponent, {
+      data: {
+        titulo: 'ELIMINAR PRODUCTO',
+        mensaje: `¿Querés eliminar "${producto.nombre}" de forma permanentemente?`,
+        textoConfirmar: 'Eliminar',
+        colorConfirmar: 'warn'
+      }
+    }).afterClosed().subscribe(async confirmacion => {
       if (confirmacion) {
         await this.productoService.eliminar(producto.id);
         await this.leer();
-        this.mostrarToast('Producto eliminado correctamente', 'eliminado');
+        this.toast.show('Producto eliminado correctamente', 'eliminado');
       }
     });
   }
+
 
   /**
    * Inicia el proceso de creación de un nuevo producto.
@@ -192,7 +196,7 @@ export class ProductosListComponent {
 
     const agregado = this.carrito.agregar(productoConPrecioFinal);
     if (agregado) {
-      this.mostrarToast('Producto agregado al carrito', 'agregado');
+      this.toast.show('Agregado al carrito', 'agregado');
     }
   }
 
@@ -242,25 +246,14 @@ export class ProductosListComponent {
     });
 
     dialogRef.afterClosed().subscribe(async resultado => {
-      if (resultado?.eliminado) {
-        this.mostrarToast('Producto eliminado correctamente', 'eliminado');
-        await this.leer();
-      } else if (resultado) {
-        await this.leer();
-      }
-    });
+  if (resultado?.eliminado) {
+    this.toast.show('Producto eliminado correctamente', 'eliminado');
+    await this.leer();
+  } else if (resultado) {
+    await this.leer();
+  }
+});
+
   }
 
-  /**
-   * Muestra un mensaje tipo toast por 3 segundos
-   * @param mensaje Texto a mostrar
-   * @param tipo Tipo de mensaje para definir color e ícono
-   */
-  mostrarToast(mensaje: string, tipo: typeof this.tipoToast = 'agregado'): void {
-    this.mensajeToast = mensaje;
-    this.tipoToast = tipo;
-    setTimeout(() => {
-      this.mensajeToast = null;
-    }, 3000);
-  }
 }

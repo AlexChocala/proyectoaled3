@@ -35,6 +35,7 @@ import {
   Calendar,
   ClipboardCheck,
   ShoppingBag,
+  Filter,
 
   // 💬 Chat y comunicación
   MessageCircle,
@@ -100,6 +101,7 @@ export const lucideIcons = {
   Calendar,
   ClipboardCheck,
   ShoppingBag,
+  Filter,
 
   // 💬 Chat y comunicación
   MessageCircle,

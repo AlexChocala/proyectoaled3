@@ -1,6 +1,5 @@
 <header class="w-full bg-[#191919] text-white shadow-md" [@fadeSlideIn]>
 
-  <!-- Header para escritorio -->
   <div class="hidden md:grid max-w-7xl mx-auto px-6 py-7 grid-cols-3 items-center">
     <!-- IZQUIERDA: Logo -->
     <div class="text-xl font-bold tracking-wide">
@@ -58,7 +57,7 @@
 
 
 
-  <!-- 📱 Header para móvil -->
+  <!-- Header para móvil -->
   <div class="relative flex md:hidden items-center h-[60px] px-6 py-5">
     <!-- Hamburguesa -->
     <div class="absolute left-6 top-1/2 -translate-y-1/2">
@@ -113,7 +112,6 @@
     <!-- Fondo oscuro con opacidad -->
     <div class="absolute inset-0 bg-black bg-opacity-80 z-40" (click)="cerrarMenuMovil()"></div>
 
-    <!-- Panel lateral (por encima del fondo) -->
     <div class="absolute inset-0 bg-[#191919] z-50 flex flex-col px-6 pt-6 pb-10 text-white">
 
       <!-- Botón de cierre -->
@@ -129,16 +127,16 @@
         <a [routerLink]="'/producto'" (click)="cerrarMenuMovil()" class="hover:text-gray-300">
           PRODUCTOS
         </a>
-        <a *ngIf="logueado" [routerLink]="'/chat'" (click)="cerrarMenuMovil()" class="hover:text-gray-300">
+        <a [routerLink]="'/chat'" (click)="cerrarMenuMovil()" class="hover:text-gray-300">
           CHAT
         </a>
+
         <a *ngIf="logueado && mostrarItem('REPORTE')" [routerLink]="'/reporte'" (click)="cerrarMenuMovil()"
           class="hover:text-gray-300">
           REPORTES
         </a>
       </div>
 
-      <!-- Línea divisoria -->
       <div class="border-t border-gray-700 my-6"></div>
 
       <!-- Usuario y sesión -->

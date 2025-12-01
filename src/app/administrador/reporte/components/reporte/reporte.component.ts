@@ -3,10 +3,13 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../usuario/services/auth.service';
 import { LucideAngularModule } from 'lucide-angular';
+import { MatDialog } from '@angular/material/dialog';
 import { VentasChartComponent } from '../../shared/ventas-chart/ventas-chart.component';
 import { CsvExportService } from '../../shared/csv-export.service';
 import { DolarApiService } from '../../../../producto/services/dolar-api.service'; // NUEVO: para cotización
 import { FirestoreService } from '../../../../services/firestore.service';
+import { FacturaDialogComponent } from '../../../../carrito/factura/factura-dialog.component';
+
 
 @Component({
   selector: 'app-reporte',
@@ -28,6 +31,7 @@ export class ReporteComponent implements OnInit {
   private productosService = new FirestoreService<any>('Productos');
   private ventasService = new FirestoreService<any>('Ventas');
   public pedidos: any[] = [];
+  
 
   // Cotización oficial del dólar
   cotizacionActual: number = 0;
@@ -36,12 +40,15 @@ export class ReporteComponent implements OnInit {
   evolucionSemanal: number[] = [];
   ventasPorDia: number[] = [];
   productosMasVendidos: any[] = [];
+  mostrarTodos = false;
+
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private csvExportService: CsvExportService,
     private dolarApi: DolarApiService, // UEVO: para obtener cotización
+    private dialog: MatDialog 
   ) { }
 
   /**
@@ -68,27 +75,41 @@ export class ReporteComponent implements OnInit {
       this.generarEvolucionSemanal(valor);
     });
 
-    // 🔹 Listar facturas
+    // Listar facturas
     await this.facturasService.listar();
 
-    this.pedidos = this.facturasService.datos.map(f => ({
-      cliente: f.email.split('@')[0],
-      email: f.email,
-      fecha: f.fecha.toDate().toLocaleDateString(),
-      productos: (f.productos || []).map((p: any) => {
-        const precioUnitario = Number(p.producto?.precio ?? 0);
-        const cantidad = Number(p.cantidad ?? 0);
-        return {
-          nombre: p.producto?.nombre || '',
-          precioUnitario,
-          cantidad,
-          subtotal: precioUnitario * cantidad
-        };
-      }),
-      totalARS: f.total,
-      totalUSD: (f.total / this.cotizacionActual).toFixed(2),
-      idPedido: f.id
-    }));
+this.pedidos = this.facturasService.datos.map(f => ({
+  cliente: f.email.split('@')[0],
+  email: f.email,
+  fecha: f.fecha.toDate().toLocaleDateString(),
+  productos: (f.productos || []).map((p: any) => {
+    const producto = p.producto ?? {};
+    const cantidad = Number(p.cantidad ?? 0);
+    const precioUnitario = Number(producto.precio ?? 0);
+
+    return {
+      producto: {
+        ...producto,
+        precioUnitario,
+        subtotal: precioUnitario * cantidad
+      },
+      cantidad
+    };
+  }),
+  totalARS: f.total,
+  totalUSD: (f.total / this.cotizacionActual).toFixed(2),
+  idPedido: f.id
+}));
+
+// Ordenar pedidos por fecha descendente (más reciente primero)
+this.pedidos.sort((a, b) => {
+  const [diaA, mesA, añoA] = a.fecha.split('/');
+  const [diaB, mesB, añoB] = b.fecha.split('/');
+  const fechaA = new Date(Number(añoA), Number(mesA) - 1, Number(diaA));
+  const fechaB = new Date(Number(añoB), Number(mesB) - 1, Number(diaB));
+  return fechaB.getTime() - fechaA.getTime();
+});
+
 
     await this.procesarProductoMasVendido();
     await this.procesarVentaPorDia();
@@ -141,7 +162,15 @@ export class ReporteComponent implements OnInit {
 
     // Sumamos solo facturas de esta semana
     for (const f of this.facturasService.datos) {
-      const fecha = f.fecha.toDate();
+      let fecha: Date;
+
+      if (typeof f.fecha === 'string') {
+        const [dia, mes, año] = f.fecha.split('/');
+        fecha = new Date(Number(año), Number(mes) - 1, Number(dia));
+      } else {
+        fecha = f.fecha.toDate();
+      }
+
       if (fecha >= inicioSemana && fecha <= finSemana) {
         const d = fecha.getDay(); // 0..6
         ventasPorDiaRaw[d] += Number(f.total) || 0;
@@ -179,6 +208,19 @@ export class ReporteComponent implements OnInit {
       base + 3.1
     ];
   }
+
+  verFactura(idPedido: string): void {
+  const pedido = this.pedidos.find(p => p.idPedido === idPedido);
+  if (pedido) {
+    this.dialog.open(FacturaDialogComponent, {
+      data: pedido,
+      width: '600px'
+    });
+  } else {
+    console.warn('Pedido no encontrado');
+  }
+}
+
 
   /**
    * Exporta las facturas en formato CSV

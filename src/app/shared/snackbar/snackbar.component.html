@@ -1,5 +1,3 @@
 @if (control.touched && getError()) {
-<mat-error class="text-red-500 text-sm mt-1">{{ getError() }}</mat-error>
-} @else if (control.valid && control.touched) {
-<mat-icon color="accent" class="icono-ok">check_circle</mat-icon>
+<mat-error class="text-red-500 text-[12px] mt-1">{{ getError() }}</mat-error>
 }

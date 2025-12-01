@@ -3,14 +3,18 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { CarritoService } from '../../services/carrito.service';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { MatdialogComponent } from '../../../shared/matdialog/matdialog.component';
 import { LucideAngularModule } from 'lucide-angular';
 import { trigger, style, transition, animate } from '@angular/animations';
 import { AuthService } from '../../../usuario/services/auth.service';
 import { DolarApiService } from '../../../producto/services/dolar-api.service'; // NUEVO: para obtener cotización
 import jsPDF from 'jspdf'; // NUEVO: para generar PDF
-import { ItemCarrito } from '../../models/item-carrito.model'; // necesario para tipar productosConfirmados
+import { ItemCarrito } from '../../models/item-carrito.model';
 import { FirestoreService } from '../../../services/firestore.service';
 import { Producto } from '../../../producto/model/producto';
+import { NotificacionesToastService } from '../../../notificaciones/service/notificaciones-toast.service';
+
 
 export interface Facturas {
   id?: string;
@@ -64,17 +68,14 @@ export class CarritoComponent implements OnInit {
   // Mensaje de advertencia por stock limitado
   mensajeStock: string | null = null;
 
-  // Mensaje visual tipo toast (éxito, info, etc.)
-  mensajeToast: string | null = null;
-
-  // Tipo de toast para definir color e ícono
-  tipoToast: 'info' | 'stock' | 'eliminado' | 'aumentado' | 'vaciado' | 'reducida' = 'info';
-
   // Estado de sesión del usuario
   estaLogueado: boolean = false;
 
   // Nombre del usuario actual (si está logueado)
   nombreUsuario: string = '';
+
+  // ID de pedido generado para reutilizar en PDF y Firestore
+  pedidoIdGenerado: string | null = null;
 
   // Lista de productos confirmados para la factura
   productosConfirmados: ItemCarrito[] = [];
@@ -86,7 +87,9 @@ export class CarritoComponent implements OnInit {
     public carrito: CarritoService,
     private authService: AuthService,
     private router: Router,
-    private dolarApi: DolarApiService // NUEVO: para obtener cotización
+    private dolarApi: DolarApiService, // NUEVO: para obtener cotización
+    private dialog: MatDialog,
+    private toast: NotificacionesToastService
   ) { }
 
   /**
@@ -144,26 +147,27 @@ export class CarritoComponent implements OnInit {
  * @param mensaje Texto a mostrar
  * @param tipo Tipo de mensaje para definir color e ícono
  */
-  mostrarToast(mensaje: string, tipo: typeof this.tipoToast = 'info'): void {
-    this.mensajeToast = mensaje;
-    this.tipoToast = tipo;
-    setTimeout(() => {
-      this.mensajeToast = null;
-    }, 3000);
-  }
 
   /**
    * Elimina un producto del carrito por su ID
    * @param id ID del producto a eliminar
    */
-  eliminarProducto(id: string): void {
-    const resultado = this.carrito.eliminarPorId(id);
-    if (resultado) {
-      this.mostrarToast(resultado, 'eliminado');
-      this.calcularTotales();
+  async eliminarDelCarrito(id: string) {
+  this.dialog.open(MatdialogComponent, {
+    data: {
+      titulo: 'Eliminar producto del carrito',
+      mensaje: '¿Estás seguro de que querés eliminar este producto del carrito?',
+      textoConfirmar: 'Eliminar',
+      colorConfirmar: 'warn'
     }
-  }
-
+  }).afterClosed().subscribe(confirmacion => {
+    if (confirmacion) {
+      this.carrito.eliminarPorId(id);
+      this.calcularTotales();
+      this.toast.show('Producto eliminado del carrito', 'eliminado');
+    }
+  });
+}
 
 
   /**
@@ -175,7 +179,7 @@ export class CarritoComponent implements OnInit {
     if (resultado === 'ok') {
     } else {
       this.mensajeStock = resultado;
-      this.mostrarToast(resultado, 'stock');
+      this.toast.show(resultado, 'stock');
     }
     this.calcularTotales();
   }
@@ -199,12 +203,23 @@ export class CarritoComponent implements OnInit {
   /**
    * Confirma si se desea vaciar el carrito
    */
-  confirmarVaciado(): void {
-    const confirmacion = confirm('¿Estás seguro de que querés vaciar el carrito?');
-    if (confirmacion) {
-      this.vaciarCarrito();
+  async vaciarCarritoConfirmacion() {
+  this.dialog.open(MatdialogComponent, {
+    data: {
+      titulo: 'Vaciar carrito',
+      mensaje: '¿Estás seguro de que querés vaciar el carrito?',
+      textoConfirmar: 'Vaciar',
+      colorConfirmar: 'warn'
     }
-  }
+  }).afterClosed().subscribe(confirmacion => {
+    if (confirmacion) {
+      this.carrito.vaciar();
+      this.calcularTotales();
+      this.toast.show('Carrito vaciado', 'eliminado');
+    }
+  });
+}
+
 
   /**
    * Vacía el carrito y muestra toast
@@ -212,136 +227,148 @@ export class CarritoComponent implements OnInit {
   vaciarCarrito(): void {
     this.carrito.vaciar();
     this.calcularTotales();
-    this.mostrarToast('Carrito vaciado', 'vaciado');
+    this.toast.show('Carrito vaciado', 'vaciado');
   }
 
-  /**
-   * Genera y descarga la factura en formato PDF
-   */
-  descargarFactura(): void {
-    const doc = new jsPDF();
+/**
+ * Genera y descarga la factura en formato PDF
+ */
+descargarFactura(): void {
+  const doc = new jsPDF();
 
-    // Generar número de pedido con fecha y hora
-    const ahora = new Date();
-    const fecha = ahora.toLocaleDateString();
-    const hora = ahora.toLocaleTimeString().replace(/:/g, '');
-    const pedidoId = `#AFS-${ahora.getFullYear()}${(ahora.getMonth() + 1).toString().padStart(2, '0')}${ahora.getDate().toString().padStart(2, '0')}-${hora}`;
+  // Usamos el pedidoId generado en procesarFactura
+  const pedidoId = this.pedidoIdGenerado ?? 'AFS-SIN-ID';
+  const ahora = new Date();
+  const fecha = ahora.toLocaleDateString();
 
-    // Encabezado
-    doc.setFontSize(18);
-    doc.text('After Street - Factura de compra', 20, 20);
-    doc.setFontSize(12);
-    doc.text(`Fecha: ${fecha}`, 20, 30);
-    doc.text(`Pedido: ${pedidoId}`, 20, 37);
-    if (this.nombreUsuario) {
-      doc.text(`Cliente: ${this.nombreUsuario}`, 20, 44);
-    }
-
-    // Totales
-    doc.text(`Total ARS: ${this.totalARS.toFixed(2)}`, 20, 54);
-    doc.text(`Total USD: ${this.totalUSD.toFixed(2)}`, 20, 61);
-
-    // Detalle de productos
-    doc.setFontSize(14);
-    doc.text('Detalle de productos:', 20, 72);
-    doc.setFontSize(11);
-    doc.line(20, 74, 190, 74);
-
-    let y = 82;
-    doc.text('Producto', 20, y);
-    doc.text('Cant.', 80, y);
-    doc.text('ARS', 110, y);
-    doc.text('USD', 140, y);
-    doc.text('Subtotal', 170, y);
-    y += 6;
-    doc.line(20, y, 190, y);
-    y += 6;
-
-    this.productosConfirmados.forEach((item) => {
-      const nombre = item.producto.nombre;
-      const cantidad = item.cantidad;
-      const precioARS = item.producto.precio;
-      const precioUSD = this.cotizacion > 0 ? +(precioARS / this.cotizacion).toFixed(2) : 0;
-      const subtotalARS = precioARS * cantidad;
-
-      doc.text(nombre, 20, y);
-      doc.text(`${cantidad}`, 80, y);
-      doc.text(`${precioARS.toFixed(2)}`, 110, y);
-      doc.text(`${precioUSD.toFixed(2)}`, 140, y);
-      doc.text(`${subtotalARS.toFixed(2)}`, 170, y);
-      y += 8;
-    });
-
-    doc.save('AfterStreet_Factura.pdf');
+  // Encabezado
+  doc.setFontSize(18);
+  doc.text('After Street - Factura de compra', 20, 20);
+  doc.setFontSize(12);
+  doc.text(`Fecha: ${fecha}`, 20, 30);
+  doc.text(`Pedido: ${pedidoId}`, 20, 37);
+  if (this.nombreUsuario) {
+    doc.text(`Cliente: ${this.nombreUsuario}`, 20, 44);
   }
 
+  // Totales
+  doc.text(`Total ARS: ${this.totalARS.toFixed(2)}`, 20, 54);
+  doc.text(`Total USD: ${this.totalUSD.toFixed(2)}`, 20, 61);
 
-  async procesarFactura(): Promise<boolean> {
-    const email = this.authService.emailActual;
+  // Detalle de productos
+  doc.setFontSize(14);
+  doc.text('Detalle de productos:', 20, 72);
+  doc.setFontSize(11);
+  doc.line(20, 74, 190, 74);
 
-    console.log("HOLA");
-    if (!email) {
-      this.mostrarToast('Debes iniciar sesión para confirmar el pedido.');
-      return false;
-    }
+  let y = 82;
+  doc.text('Producto', 20, y);
+  doc.text('Cant.', 80, y);
+  doc.text('ARS', 110, y);
+  doc.text('USD', 140, y);
+  doc.text('Subtotal', 170, y);
+  y += 6;
+  doc.line(20, y, 190, y);
+  y += 6;
 
-    const productos = this.carrito.productos; // ItemCarrito[]
+  this.productosConfirmados.forEach((item) => {
+    const nombre = item.producto.nombre;
+    const cantidad = item.cantidad;
+    const precioARS = item.producto.precio;
+    const precioUSD = this.cotizacion > 0 ? +(precioARS / this.cotizacion).toFixed(2) : 0;
+    const subtotalARS = precioARS * cantidad;
 
-    // 🔹 Convertir ItemCarrito[] a objetos planos
-    const productosPlano = this.carrito.productos.map(item => ({
-      cantidad: item.cantidad,
-      producto: {
-        id: item.producto.id,
-        nombre: item.producto.nombre,
-        categoria: item.producto.categoria,
-        descripcion: item.producto.descripcion,
-        imagen: item.producto.imagen,
-        precio: item.producto.precio,
-        stock: item.producto.stock
-      }
-    }));
+    doc.text(nombre, 20, y);
+    doc.text(`${cantidad}`, 80, y);
+    doc.text(`${precioARS.toFixed(2)}`, 110, y);
+    doc.text(`${precioUSD.toFixed(2)}`, 140, y);
+    doc.text(`${subtotalARS.toFixed(2)}`, 170, y);
+    y += 8;
+  });
 
-    const total = this.totalARS;
-    const fecha = new Date();
+  // Guardamos el PDF con el mismo ID de pedido
+  doc.save('AfterStreet_Factura.pdf');
+}
 
-    const factura: Facturas = {
-      email,
-      fecha,
-      productos: productosPlano,
-      total
-    };
-    console.log("HOLA1");
-    localStorage.getItem('carrito')
 
-    await this.facturasService.agregar(factura);
+/**
+ * Procesa la factura y guarda en Firestore
+ */
+async procesarFactura(): Promise<boolean> {
+  const email = this.authService.emailActual;
 
-    try {
-      console.log("HOLA2");
-      console.log("NOMO ", this.carrito.productos);
-      console.log("Cantidad de productos:", this.carrito);
-      // for (let item of this.carrito.productos) {
-      for (let item of productosPlano) {
-        console.log("HOLA3");
-
-        const idProducto = item.producto.id;
-        const cantidadVendida = item.cantidad;
-        console.log("HOLA4");
-
-        await this.actualizarStockProducto(idProducto, cantidadVendida);
-        console.log("el id del producto es ", idProducto);
-        console.log("cantidad vendida es ", cantidadVendida);
-        await this.actualizarAcumuladoVenta(idProducto, cantidadVendida);
-      }
-
-      // 3. Confirmación visual
-      this.mostrarToast('Pedido confirmado, ventas registradas y stock actualizado.');
-      return true;
-    } catch (error) {
-      console.error('Error al procesar la factura:', error);
-      this.mostrarToast('Ocurrió un error al procesar los datos.');
-      return false;
-    }
+  console.log("HOLA");
+  if (!email) {
+    this.toast.show('Debes iniciar sesión para confirmar el pedido.', 'info');
+    return false;
   }
+
+  const productosPlano = this.carrito.productos.map(item => ({
+    cantidad: item.cantidad,
+    producto: {
+      id: item.producto.id,
+      nombre: item.producto.nombre,
+      categoria: item.producto.categoria,
+      descripcion: item.producto.descripcion,
+      imagen: item.producto.imagen,
+      precio: item.producto.precio,
+      stock: item.producto.stock
+    }
+  }));
+
+  const total = this.totalARS;
+  const fecha = new Date();
+
+  // Generar ID de pedido único (una sola vez)
+  const ahora = new Date();
+  const hora = ahora.toLocaleTimeString().replace(/:/g, '');
+  const pedidoId = `AFS-${ahora.getFullYear()}${(ahora.getMonth() + 1).toString().padStart(2, '0')}${ahora.getDate().toString().padStart(2, '0')}-${hora}`;
+
+  // Guardamos el pedidoId en una propiedad para reutilizar en descargarFactura
+  this.pedidoIdGenerado = pedidoId;
+
+  // Crear factura con ese ID
+  const factura: Facturas = {
+    id: pedidoId,
+    email,
+    fecha,
+    productos: productosPlano,
+    total
+  };
+
+  console.log("HOLA1");
+  localStorage.getItem('carrito');
+
+  // Guardar en Firestore usando ese ID
+  await this.facturasService.guardarConId(pedidoId, factura);
+
+  try {
+    console.log("HOLA2");
+    console.log("NOMO ", this.carrito.productos);
+    console.log("Cantidad de productos:", this.carrito);
+
+    for (let item of productosPlano) {
+      console.log("HOLA3");
+
+      const idProducto = item.producto.id;
+      const cantidadVendida = item.cantidad;
+      console.log("HOLA4");
+
+      await this.actualizarStockProducto(idProducto, cantidadVendida);
+      console.log("el id del producto es ", idProducto);
+      console.log("cantidad vendida es ", cantidadVendida);
+      await this.actualizarAcumuladoVenta(idProducto, cantidadVendida);
+    }
+
+    // Confirmación visual
+    this.toast.show('Pedido confirmado, ventas registradas y stock actualizado.', 'agregado');
+    return true;
+  } catch (error) {
+    console.error('Error al procesar la factura:', error);
+    this.toast.show('Ocurrió un error al procesar los datos.', 'error');
+    return false;
+  }
+}
 
   private async actualizarAcumuladoVenta(idProducto: string, cantidadVendida: number): Promise<void> {
     const ventasDeProducto = await this.ventasAcumuladasService.buscarPorCampo('idProducto', idProducto);

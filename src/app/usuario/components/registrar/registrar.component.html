@@ -1,10 +1,27 @@
 <!-- CONTENEDOR CENTRAL -->
-<div class="bg-gray-50 px-6 flex" style="height: calc(100vh - 90px);">
+<div class="bg-gray-50 px-6 flex relative" style="height: calc(100vh - 90px);">
+
+  <!-- Indicador visual flotante arriba del card -->
+  <div class="absolute top-6 left-1/2 transform -translate-x-1/2 z-50" *ngIf="cargando || registradoExitoso">
+    @if (cargando) {
+    <mat-progress-spinner diameter="30" mode="indeterminate" class="!text-[#191919] !stroke-[#191919]">
+    </mat-progress-spinner>
+    }
+    @if (registradoExitoso) {
+    <div class="flex flex-col items-center">
+      <i-lucide name="check-circle" class="w-8 h-8 text-[#191919]"></i-lucide>
+      <p class="mt-1 text-[#191919] font-bold text-sm">Registrado con éxito</p>
+    </div>
+    }
+  </div>
+
+  <!-- CARD DE REGISTRO -->
   <div class="m-auto w-full max-w-[500px] bg-white rounded-xl shadow-xl overflow-hidden" [@fadeInUp]>
     <!-- ENCABEZADO -->
     <div class="bg-[#191919] text-white px-6 py-4 rounded-t-xl text-center">
       <h2 class="text-2xl font-bold tracking-wide">REGISTRO</h2>
     </div>
+
     <!-- CONTENIDO -->
     <div class="p-6 space-y-6">
       <!-- ACCESO CON PROVEEDORES -->
@@ -12,47 +29,38 @@
         <p class="text-sm text-gray-600">Registrate rápidamente con:</p>
         <app-boton-proveedor></app-boton-proveedor>
         <div class="relative w-full text-center">
-          <hr
-            class="border-gray-300 my-4"
-          >
+          <hr class="border-gray-300">
           <span class="absolute top-[-12px] left-1/2 transform -translate-x-1/2 bg-white px-2 text-sm text-gray-500">
             o con tu cuenta
           </span>
         </div>
       </div>
+
       <!-- FORMULARIO -->
-      <form [formGroup]="formularioUsuario" (ngSubmit)="confirmar()" class="space-y-6">
-        <app-campos-formulario [camposFormulario]="camposFormulario" [camposValidacion]="camposValidacion" [formulario]="formularioUsuario">
+      <form [formGroup]="formularioUsuario" (ngSubmit)="confirmar()" class="space-y-4">
+        <app-campos-formulario [camposFormulario]="camposFormulario" [camposValidacion]="camposValidacion"
+          [formulario]="formularioUsuario">
         </app-campos-formulario>
+
         <!-- BOTONES -->
-        <div class="flex flex-col gap-3 cursor-pointer">
+        <div class="flex flex-col gap-3 cursor-pointer mt-6">
           <button type="button" (click)="confirmar()" [ngClass]="{
             'bg-[#191919] hover:bg-black text-white': formularioUsuario.valid || cargando,
             'bg-[#5e5e5e] text-gray-300': formularioUsuario.invalid || cargando
           }" class="py-2 px-4 rounded-md transition duration-300 w-full cursor-pointer">
             Confirmar
           </button>
-          @if (!cargando) {
-    Confirmar
-  } @else {
-          <mat-progress-spinner diameter="20" mode="indeterminate" color="accent"></mat-progress-spinner>
-          }
         </div>
+
         <!-- YA TENÉS CUENTA -->
         <div class="text-center mt-6">
           <p class="text-sm text-gray-600">¿Ya tienes cuenta?
             <a routerLink="/iniciar_sesion" class="text-black hover:underline font-medium ml-1">
-              INICIAR SESIÓN
-            </a></p>
+              Iniciar Sesión
+            </a>
+          </p>
         </div>
       </form>
     </div>
   </div>
 </div>
-<!-- Overlay de carga -->
-@if (cargando) {
-<div class="fixed inset-0 z-50 bg-white bg-opacity-80 flex flex-col items-center justify-center">
-  <mat-progress-spinner diameter="80" mode="indeterminate" color="primary"></mat-progress-spinner>
-  <p class="mt-4 text-gray-700 font-medium text-lg">Registrando usuario...</p>
-</div>
-}

@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Producto } from '../../model/producto';
 import { LucideAngularModule } from 'lucide-angular';
 import { trigger, style, transition, animate } from '@angular/animations';
@@ -12,6 +11,7 @@ import { CampoFormulario } from '../../../shared/campoFormulario';
 import { CampoValidacion } from '../../../shared/campoValidacion';
 import { VALIDACION_CAMPOS_PRODUCTO } from '../../validacion/validacionCamposProducto';
 import { FORMULARIO_CAMPOS_PRODUCTO } from '../../model/formularioCamposProducto';
+import { NotificacionesToastService } from '../../../notificaciones/service/notificaciones-toast.service';
 
 @Component({
   selector: 'app-productos-form',
@@ -36,7 +36,7 @@ export class ProductosFormComponent {
 
   /* elementos html */
   private dialogRef = inject(MatDialogRef<ProductosFormComponent>);
-  private snackBar = inject(MatSnackBar);
+  private toast = inject(NotificacionesToastService);
 
   /* datos */
   private fb = inject(FormBuilder);
@@ -48,16 +48,6 @@ export class ProductosFormComponent {
   formularioProducto!: FormGroup;
 
   esEdicion = false;
-
-  /**
-   * Mensaje visual tipo toast (éxito, info, etc.)
-   */
-  mensajeToast: string | null = null;
-
-  /**
-   * Tipo de toast para definir color e ícono
-   */
-  tipoToast: 'agregado' | 'modificado' | 'eliminado' = 'agregado';
 
   /**
    * Método de inicialización del componente que configura el estado del formulario dinámico.
@@ -121,40 +111,35 @@ export class ProductosFormComponent {
    * En ambos casos, se muestra una notificación contextual mediante `mostrarToast()` y se cierra el diálogo.
    */
   async registrar() {
-  this.formularioProducto.markAllAsTouched(); // activa la visualización de errores como en login
+    this.formularioProducto.markAllAsTouched();
 
-  if (this.formularioProducto.valid) {
-    // Convertimos stock y precio a número para evitar errores posteriores
-    let prod = {
-      ...this.formularioProducto.value,
-      stock: Number(this.formularioProducto.value.stock),
-      precio: Number(this.formularioProducto.value.precio)
-    } as Producto;
+    if (this.formularioProducto.valid) {
+      let prod = {
+        ...this.formularioProducto.value,
+        stock: Number(this.formularioProducto.value.stock),
+        precio: Number(this.formularioProducto.value.precio)
+      } as Producto;
 
-    if (this.esEdicion && this.data.producto?.id) {
-      prod = { ...prod, id: this.data.producto.id };
-    }
+      if (this.esEdicion && this.data.producto?.id) {
+        prod = { ...prod, id: this.data.producto.id };
+      }
 
-    let msg = this.esEdicion ? 'modificado' : 'agregado';
+      let msg = this.esEdicion ? 'modificado' : 'agregado';
 
-    if (msg === 'agregado') {
-      await this.productoService.agregar(prod);
-      this.mostrarToast('Producto agregado correctamente', 'agregado');
-      setTimeout(() => {
+      if (msg === 'agregado') {
+        await this.productoService.agregar(prod);
+        this.toast.show('Agregado correctamente', 'agregado');
         this.dialogRef.close(prod);
-      }, 3000);
-    } else if (msg === 'modificado') {
-      const huboCambios = !this.sonIguales(this.data.producto, prod);
-      await this.productoService.modificar(prod);
-      const mensaje = huboCambios
-        ? 'Producto modificado correctamente'
-        : 'Producto SIN CAMBIOS';
-      this.mostrarToast(mensaje, 'modificado');
-      setTimeout(() => {
+      } else if (msg === 'modificado') {
+        const huboCambios = !this.sonIguales(this.data.producto, prod);
+        await this.productoService.modificar(prod);
+        const mensaje = huboCambios
+          ? 'Modificado correctamente'
+          : 'Producto SIN CAMBIOS';
+        this.toast.show(mensaje, 'modificado');
         this.dialogRef.close(prod);
-      }, 3000);
+      }
     }
-  }
   }
 
   /**
@@ -163,24 +148,9 @@ export class ProductosFormComponent {
   async eliminar(): Promise<void> {
     if (this.data.producto?.id) {
       await this.productoService.eliminar(this.data.producto.id);
-      this.mostrarToast('Producto eliminado correctamente', 'eliminado');
-      setTimeout(() => {
-  this.dialogRef.close({ eliminado: true });
-}, 10); // cerramos rápido, pero el padre se encarga del toast
+      this.toast.show('Eliminado correctamente', 'eliminado');
+      this.dialogRef.close({ eliminado: true });
     }
-  }
-
-  /**
-   * Muestra un mensaje tipo toast por 3 segundos
-   * @param mensaje Texto a mostrar
-   * @param tipo Tipo de mensaje para definir color e ícono
-   */
-  mostrarToast(mensaje: string, tipo: typeof this.tipoToast = 'agregado'): void {
-    this.mensajeToast = mensaje;
-    this.tipoToast = tipo;
-    setTimeout(() => {
-      this.mensajeToast = null;
-    }, 3000);
   }
 
   /**

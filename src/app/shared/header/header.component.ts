@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../usuario/services/auth.service';
 import { LucideAngularModule } from 'lucide-angular';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { CarritoService } from '../../carrito/services/carrito.service';
 import { ChatService } from '../../chat/services/chat.service'; // NUEVO: para contador de mensajes
+import { NotificacionesToastService } from '../../notificaciones/service/notificaciones-toast.service';
+
 
 @Component({
   selector: 'app-header',
@@ -58,9 +59,9 @@ export class HeaderComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar,
     public carrito: CarritoService,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private toast: NotificacionesToastService
   ) {
     this.authService.usuario$.subscribe(async usuario => {
     this.logueado = !!usuario;
@@ -90,18 +91,18 @@ export class HeaderComponent {
 
   // Cierra sesión del usuario y redirige al login
   async cerrar_sesion(): Promise<void> {
-    try {
-      await this.authService.cerrar_sesion();
-      this.snackBar.open('Salida exitosa', 'Cerrar', { duration: 3000 });
-      this.router.navigate(['/iniciar_sesion']);
-    } catch (err) {
-      const error = err as { error?: { mensaje?: string } };
-      const mensaje = error.error?.mensaje || 'Verificá los datos.';
-      alert('Error al registrar: ' + mensaje);
-      this.snackBar.open('Error al registrar usuario', 'Cerrar', { duration: 3000 });
-      console.error('Error al registrar usuario:', err);
-    }
+  try {
+    await this.authService.cerrar_sesion();
+    this.toast.show('Salida exitosa', 'logout');
+    this.router.navigate(['/iniciar_sesion']);
+  } catch (err) {
+    const error = err as { error?: { mensaje?: string } };
+    const mensaje = error.error?.mensaje || 'Verificá los datos.';
+    this.toast.show('Error al cerrar sesión: ' + mensaje, 'error'); 
+    console.error('Error al cerrar sesión:', err);
   }
+}
+
 
   toggleMenuMovil(): void {
     this.menuMovilAbierto = true;

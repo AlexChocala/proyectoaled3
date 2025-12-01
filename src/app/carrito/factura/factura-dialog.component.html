@@ -1,0 +1,82 @@
+<div class="relative p-6 space-y-6 text-sm text-[#191919]">
+    <!-- Botón de cierre -->
+    <button (click)="cerrarFactura()" aria-label="Cerrar"
+        class="absolute top-4 right-4 bg-[#191919] border border-gray-300 hover:border-gray-400 hover:shadow-sm p-2 rounded-full transition active:scale-[0.97] cursor-pointer">
+        <i-lucide name="x" class="w-4 h-4 text-white"></i-lucide>
+    </button>
+
+
+    <!-- Encabezado -->
+    <div class="space-y-6">
+        <h2 class="text-xl font-bold flex justify-center items-center gap-2 border-b pb-4">
+            <i-lucide name="file-text" class="w-5 h-5 text-[#191919]"></i-lucide>
+            <span>Factura de {{ data.cliente | titlecase }}</span>
+        </h2>
+
+        <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
+            <div class="flex items-center gap-2">
+                <i-lucide name="mail" class="w-4 h-4 text-[#191919]"></i-lucide>
+                <span>{{ data.email }}</span>
+            </div>
+            <div class="flex items-center gap-2 justify-end">
+                <i-lucide name="calendar" class="w-4 h-4 text-[#191919]"></i-lucide>
+                <span>{{ data.fecha }}</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 justify-end">
+                    <i-lucide name="package" class="w-4 h-4 text-[#191919]"></i-lucide>
+                    <span class="text-xs text-[#191919]">{{ data.idPedido }}</span>
+                </div>
+            </div>
+
+
+            <div class="flex items-center gap-2 justify-end">
+                <span>Total USD: {{ data.totalUSD | currency:'USD' }}</span>
+            </div>
+
+            <div class="flex items-center gap-2 col-span-2 justify-center pt-2">
+                <i-lucide name="credit-card" class="w-4 h-4 text-[#191919]"></i-lucide>
+                <span class="font-semibold">Total ARS: {{ data.totalARS | currency:'ARS' }}</span>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Productos -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-md p-5">
+        <h3 class="text-sm font-semibold mb-4 flex items-center gap-2">
+            <i-lucide name="shopping-bag" class="w-4 h-4 text-[#191919]"></i-lucide>
+            <span>Productos</span>
+        </h3>
+        <div class="grid grid-cols-3 font-semibold text-xs text-gray-500 uppercase border-b pb-2 mb-3">
+            <div>Imagen</div>
+            <div>Producto</div>
+            <div class="text-right">Cantidad</div>
+        </div>
+        <div *ngFor="let p of data.productos"
+            class="grid grid-cols-3 items-center py-3 border-b last:border-none hover:bg-gray-50 transition">
+            <!-- Imagen -->
+            <div class="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                <img [src]="p.producto.imagen" alt="{{ p.producto.nombre }}" class="object-cover w-full h-full" />
+            </div>
+            <!-- Nombre -->
+            <div class="text-sm text-gray-800 font-bold">{{ p.producto.nombre }}</div>
+            <!-- Cantidad -->
+            <div class="text-sm text-gray-600 font-bold text-right">x{{ p.cantidad }}</div>
+        </div>
+    </div>
+
+    <!-- Botón de descarga -->
+    <div class="flex justify-center pt-6">
+        <button
+            class="mb-4 mx-auto flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-[#191919] px-4 py-2 rounded-md text-sm transition active:scale-[0.98] cursor-pointer"
+            (click)="descargarFactura()">
+            <i-lucide name="download" class="w-4 h-4"></i-lucide>
+            <span>Descargar factura PDF</span>
+        </button>
+    </div>
+
+
+</div>

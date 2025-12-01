@@ -3,7 +3,6 @@ import { AuthService, Credencial } from '../../services/auth.service';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { LucideAngularModule } from 'lucide-angular';
 import { BotonProveedorComponent } from '../login/boton-proveedor/boton-proveedor.component';
 import { trigger, style, transition, animate } from '@angular/animations';
@@ -13,6 +12,8 @@ import { FORMULARIO_CAMPOS_USUARIO } from '../../models/formularioCamposUsuario'
 import { VALIDACION_CAMPOS_USUARIO } from '../../validacion/validacionFormularioCamposUsuario';
 import { FormularioComponent, generarFormulario } from '../../../shared/formulario/formulario.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NotificacionesToastService } from '../../../notificaciones/service/notificaciones-toast.service';
+
 
 @Component({
   selector: 'app-registrar',
@@ -42,20 +43,16 @@ export class RegistrarComponent {
 
   /** Servicios requeridos*/
   private authService: AuthService = inject(AuthService);
-
-  /* html contenido**/
-  private snackBar: MatSnackBar = inject(MatSnackBar);
-  private router: Router = inject(Router);  /* datos*/
-
-  /* datos **/
+  private toast: NotificacionesToastService = inject(NotificacionesToastService);
+  private router: Router = inject(Router); 
   private fb: FormBuilder = inject(FormBuilder);
 
   camposFormulario: CampoFormulario[] = FORMULARIO_CAMPOS_USUARIO;
   camposValidacion: CampoValidacion[] = VALIDACION_CAMPOS_USUARIO;
 
   formularioUsuario!: FormGroup;
-
   cargando = false;
+  registradoExitoso = false;
 
   async ngOnInit(): Promise<void> {
 
@@ -71,37 +68,43 @@ export class RegistrarComponent {
   * Registra el usuario con nombre incluido
   */
   async confirmar(): Promise<void> {
-    if (this.formularioUsuario.invalid) {
-      // 👉 Marca todos los campos como tocados para que se muestren los errores
-      Object.values(this.formularioUsuario.controls).forEach(control => control.markAsTouched());
-      return;
-    }
-
-    const usrValido = this.formularioUsuario;
-
-    const credencial: Credencial = {
-      nombre: usrValido.value.nombre,
-      email: usrValido.value.email,
-      contrasena: usrValido.value.contrasena,
-      rol: usrValido.value.rol ?? 'usuario'
-    };
-    this.cargando = true;
-    const nombre = usrValido.value.nombre;
-    console.log("CREDENCIAL", credencial);
-
-    try {
-      await this.authService.registrarse(credencial, nombre);
-      this.snackBar.open('Registro exitoso', 'Cerrar', { duration: 3000 });
-      this.formularioUsuario.reset();
-      this.router.navigate(['/home']);
-    } catch (err) {
-      alert('Error al registrar: ' + (err || 'Verificá los datos.'));
-      this.snackBar.open('Error al registrar usuario', 'Cerrar', { duration: 3000 });
-      console.error(err);
-    } finally {
-      this.cargando = false;
-    }
+  if (this.formularioUsuario.invalid) {
+    Object.values(this.formularioUsuario.controls).forEach(control => control.markAsTouched());
+    return;
   }
+
+  const usrValido = this.formularioUsuario;
+  const credencial: Credencial = {
+    nombre: usrValido.value.nombre,
+    email: usrValido.value.email,
+    contrasena: usrValido.value.contrasena,
+    rol: usrValido.value.rol ?? 'usuario'
+  };
+
+  this.cargando = true;
+  const nombre = usrValido.value.nombre;
+
+  try {
+    await this.authService.registrarse(credencial, nombre);
+    this.formularioUsuario.reset();
+
+    setTimeout(() => {
+      this.cargando = false;
+      this.registradoExitoso = true;
+
+      setTimeout(() => {
+        this.router.navigate(['/home']);
+      }, 1000);
+    }, 2000);
+  } catch (err) {
+    this.cargando = false;
+    const mensaje = err || 'Verificá los datos.';
+    this.toast.show('Error al registrar usuario: ' + mensaje, 'error');
+    console.error(err);
+  }
+}
+
+
 
   cancelar() {
     this.formularioUsuario.reset();

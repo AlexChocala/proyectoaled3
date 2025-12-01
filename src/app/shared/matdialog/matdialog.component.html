@@ -1,6 +1,31 @@
-    <h2 mat-dialog-title>Confirmar eliminación</h2>
-    <mat-dialog-content>¿Estás seguro de que querés eliminar este archivo?</mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button (click)="cancelar()">Cancelar</button>
-      <button mat-raised-button color="warn" (click)="confirmar()">Eliminar</button>
-    </mat-dialog-actions>
+<!-- CONTENEDOR DEL MODAL -->
+<div class="w-full max-w-[420px] bg-white rounded-xl shadow-xl overflow-hidden">
+
+  <!-- ENCABEZADO -->
+  <div class="bg-[#191919] text-white px-6 py-4 text-center">
+    <h2 class="text-xl font-bold tracking-wide">
+      {{ data.titulo }}
+    </h2>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div class="px-6 py-6 flex flex-col items-center space-y-6 text-gray-700">
+    <p class="text-center">
+      {{ data.mensaje }}
+    </p>
+
+    <!-- BOTONES -->
+    <div class="flex justify-center gap-4 w-full">
+      <button class="flex-1 px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition cursor-pointer"
+        (click)="cancelar()">
+        Cancelar
+      </button>
+
+      <button
+        class="flex-1 px-4 py-2 rounded-md font-semibold text-white bg-red-600 hover:bg-red-700 transition cursor-pointer"
+        (click)="confirmar()">
+        {{ data.textoConfirmar || 'Confirmar' }}
+      </button>
+    </div>
+  </div>
+</div>

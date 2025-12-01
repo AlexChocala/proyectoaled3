@@ -63,10 +63,16 @@
       }
     </div>
 
-    <!-- MENSAJE DE ERROR -->
-    <app-snackbar-validacion [control]="getControl(campo.nombre)" [campoNombre]="campo.nombre"
-      [camposValidacion]="camposValidacion">
-    </app-snackbar-validacion>
+    <div class="relative h-[20px]">
+      <div
+        class="absolute left-0 top-0 w-full text-[1px] text-red-500 pointer-events-none overflow-hidden leading-[14px]">
+
+        <app-snackbar-validacion [control]="getControl(campo.nombre)" [campoNombre]="campo.nombre"
+          [camposValidacion]="camposValidacion">
+        </app-snackbar-validacion>
+
+      </div>
+    </div>
   </div>
   }@empty {
   <p>NADA QUE CARGAR</p>

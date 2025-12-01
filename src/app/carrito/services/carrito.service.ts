@@ -79,14 +79,10 @@ export class CarritoService {
    * Elimina un producto del carrito usando su ID directamente, con confirmación.
    */
   eliminarPorId(id: string): string {
-    const confirmar = confirm('¿Desea eliminar el producto del carrito?');
-    if (confirmar) {
-      this.items = this.items.filter(i => i.producto.id !== id);
-      this.guardarEnLocalStorage(); // Guardar después de eliminar
-      return 'Producto eliminado del carrito.';
-    }
-    return 'cancelado';
-  }
+  this.items = this.items.filter(i => i.producto.id !== id);
+  this.guardarEnLocalStorage(); // Guardar después de eliminar
+  return 'Producto eliminado del carrito.';
+}
 
   /**
    * Aumenta la cantidad de un producto por ID, respetando el stock.
